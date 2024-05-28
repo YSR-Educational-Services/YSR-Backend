@@ -1,0 +1,14 @@
+{
+    "type": "service_account",
+    "project_id": "pure-spirit-423908-f5",
+    "private_key_id": "297dbecfc8ee039cb296e9df051620c0baa1fed7",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC2yUjQ6voJnqLN\nLzTE6JyBfWzHvGwlYRxM/3owgMRjUAgoSeLTFPMQ9h5dm4dJTc70IxQq8ZHi+aI7\naifvwCCRCdAQfxZSLV5ve/255I0Agy3mlOugVDL72PHTBqeXKWcRRKWgjEl74ve+\n5LM6sKyhHlWjhzo2yYHxK04z4Ppzdg9pORINQAIEbOTxmdgjfNBP2d1+/aA63WF1\nOUKylUlhfAeL+Z0VZLaHhtumbE6SBWoBYTccWk+7Umb7vnVxT1huva25sCHH6IeP\n9DQYTOnZqSeGWfeSB853g7BBCclKvEOomvqVB9FpegUX22p8ZMEztzU4nwb5KRwh\n8CrB1eKVAgMBAAECggEABFjEDQfRe2IU4AlD2Xzon+GyMQvHjJoDGMeoibe+M9hm\n4UJkjP1+DES2EybMME+T4NVmuOC2xe2G0J/lJDvu6lQP6RyElN60VLVfosiPG9iC\nwm1/LvhhoACYO5r4aE1ZQJ1fzPIZG0OZ/aWlp3slF83HXpSsKzpehzQu72flvNIj\nIGvvSzb46i20GqCrht/gBK/PRK2FBVMtCGv+f3bVHMlGEXRw6yLuKZyJKVrQkysP\n69gIuI1muH+L4uhBj7uBuDv3y3Tf+Vt/flT+SFHA8m7nMrA7a/rNVcvjerBzGqPJ\n6GpbUxCMfx0PZmx67f4wvEqrBI4ruffKy9g1C2eigQKBgQDcPvxksSY2mTteWorl\naAYBCjtot3uQIxy6/Kq/HUA6K2w8yCAVLal8T8o1OiR5huetU4fiuiyle9AyYLJZ\nt4dR5opwA+mGhtqa+vWcPZ0d0nyRLACe/Jbc0zY4qD5B8X5qn3E/H3kBo7NSCXGK\nUMIZcnuvsIP3i06xDNXk9tW1QQKBgQDUdYpWRvMXCTFQqIHSsbTq8I9vCEL0RrLg\nMUNgxFawftkI+3NMrTKDeJZVIcrXbZFcmiUgDWZfR5h7U9Ek2BOC1nCBZdXP3IgT\niifNwzEGuG+VhD8149a71I72Oppy4iubZ5HAe2jwhBAKHfSzKuBhNTddQEr6YYfV\ngDMtIq+0VQKBgQCyFjv/Lz625zAaGxw0Yuh37s4a3kILSljw2V03K2/DmVjrzOYk\nOcfRvLLEVz8nBO5QODqoGeH/7R1rnsSXxs6kasWFzaQGIwSgTExNCYUBmDEhMXNP\nGu7hn+c36NJuf9a4YDQx1kECElvs+bXVIXfRG8DnTtNmVj5K6xYJDY3AAQKBgQCg\nNEmuKS3grvPayFWslIfBqMffh7FFFZKIb11JOIPN7rilh0Y4CVnPvTxO0X5s15gG\n5c0c0D3jls8qH9fTGoQL4rtPN4T0imypn0HIbGkpkiXB7sjjT/x6AhwTG7me62DK\nfFxxch19T3fwyQndmHU9l605yeM/zg9pNJRicodfSQKBgQDF752NtHbWQsBxWrsv\nKERJCbNGXfmQcz9CQSAZaB80qpFphqdB6sxejOcGCwvDQ/TzPXtJm97VzQCDlpqK\npp3pYmuhpNcPz7j2zH4Nt5qhlO8vjX/6asEdLDpTi5f2gJjMXWXcjDmQHFKYvyBx\nXS+Q2/5WQLlQYs+GzUHMK1VuXA==\n-----END PRIVATE KEY-----\n",
+    "client_email": "studentregidtrations@pure-spirit-423908-f5.iam.gserviceaccount.com",
+    "client_id": "107506101391690811638",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/studentregidtrations%40pure-spirit-423908-f5.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  }
+  

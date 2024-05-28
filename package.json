@@ -1,0 +1,40 @@
+{
+  "name": "form_node",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "dev": "concurrently \"nodemon index.js\"",
+    "db:create": "sequelize db:create --charset utf8mb4 --collate utf8mb4_unicode_ci",
+    "db:migrate": "sequelize db:migrate",
+    "db:drop": "sequelize db:drop",
+    "prod:db:migrate": "NODE_ENV=production sequelize db:migrate",
+    "db:migrate:undo:all": "sequelize db:migrate:undo:all",
+    "prod:db:create": "NODE_ENV=production sequelize db:create --charset utf8mb4 --collate utf8mb4_unicode_ci",
+    "db:seed": "sequelize db:seed:all",
+    "prod:db:seed": "NODE_ENV=production sequelize db:seed:all",
+    "prod:db:drop": "NODE_ENV=production sequelize db:drop --charset utf8mb4 --collate utf8mb4_unicode_ci",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
+    "express": "^4.19.2",
+    "fs": "^0.0.1-security",
+    "google-spreadsheet": "^4.1.2",
+    "googleapis": "^129.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.9.7",
+    "nodemon": "^3.1.0",
+    "react-router-dom": "^6.23.0",
+    "sequelize": "^6.37.3",
+    "sequelize-cli": "^6.6.2",
+    "xlsx": "^0.18.5"
+  }
+}
