@@ -75,7 +75,7 @@ const getListOfEmcet = async (req, res) => {
 
     await databases.emcetStudent.findAll({
       attributes: { exclude: ["craetedAt", "updatedAt"] },
-      order: [["createdAt", "DESC"]],
+      order: [["createdAt", "DESC"]]
     });
   } catch (error) {
     console.log(error);
