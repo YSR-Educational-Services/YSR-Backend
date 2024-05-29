@@ -150,51 +150,10 @@ const getAllStudentsDetails = async (req, res) => {
 
 
 
-const craeteEcetStudent = async (req, res) => {
-  try {
-    let inputData = req.body;
 
-    const mappedReference = inputData.reference.map((reference) => {
-      return `${reference.friendName}: ${reference.friendPhoneNumber}`;
-    });
-
-    let studentData = await databases.ecetStudent.create({
-      nameOfApplicant: inputData.nameOfApplicant,
-      fatherName: inputData.fatherName,
-      dateOfBirth: inputData.dateOfBirth,
-      addressOfCommunication: inputData.addressOfCommunication,
-      phoneNumber: inputData.phoneNumber,
-      aadharNo: inputData.aadharNo,
-      category: inputData.category,
-      polytechnicClgName: inputData[0].qualifyingDetails.polytechnicClgName,
-      polytechnicPassingYear:
-        inputData[0].qualifyingDetails.polytechnicPassingYear,
-      polytechnicPercentage:
-        inputData[0].qualifyingDetails.polytechnicPercentage,
-      ECETHallTicketNo: inputData[0].qualifyingDetails.ECETHallTicketNo,
-      ECETRank: inputData[0].qualifyingDetails.ECETRank,
-      nameofInstution: inputData.nameofInstution,
-      courseName: inputData.courseName.map((course) => course).join(", "),
-      withReferenceOf: inputData.withReferenceOf,
-      reference: mappedReference.map((referance) => referance).join(",")
-    });
-
-    if (studentData) {
-      return res.status(200).json({
-        success: true,
-        data: studentData
-      });
-    }
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
 module.exports = {
   createStudentRegistration,
   getStudentDetailsById,
   getAllStudentsDetails,
-  craeteEcetStudent
+  
 };

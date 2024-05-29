@@ -49,11 +49,11 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.FLOAT,
         allowNull: false
       },
-      EMCETHallTicketNo: {
+      ECETHallTicketNo: {
         type: DataTypes.STRING,
         allowNull: false
       },
-      EMCETRank: {
+      ECETRank: {
         type: DataTypes.INTEGER,
         allowNull: false
       },

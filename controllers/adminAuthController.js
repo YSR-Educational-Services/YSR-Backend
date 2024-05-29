@@ -48,7 +48,6 @@ const createAdmin = async (req, res) => {
 
 const adminLogin = async (req, res) => {
   try {
-    console.log(123);
     const { email, password } = req.body;
     let userData = await databases.admin.findOne({
       where: { email }
@@ -62,6 +61,7 @@ const adminLogin = async (req, res) => {
     const hashPassword = userData.password;
 
     const result = bcrypt.compareSync(password, hashPassword);
+    console.log(userData.adminType);
     if (result) {
       const payload = {
         id: userData.id,

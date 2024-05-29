@@ -5,7 +5,8 @@ const createTokens = async (payload, databases) => {
     const accessToken = jwt.sign(
       {
         id: payload.id,
-        email: payload.email
+        email: payload.email,
+        adminType: payload.adminType
       },
       process.env.ACCESS_JWT_SECRET
       // {

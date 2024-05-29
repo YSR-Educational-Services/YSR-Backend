@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const databases = require("../config/databases");
 
 const auth = async (req, res, next) => {
   const bearerHeader =
