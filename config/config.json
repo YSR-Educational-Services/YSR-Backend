@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "root",
-    "password": "password",
-    "database": "ysr-students-records",
-    "host": "localhost",
+    "username": "admin",
+    "password": "GIFT$day#uK",
+    "database": "Testing2-Testing",
+    "host": "gift4day.ch20y4m24yxm.ap-south-1.rds.amazonaws.com",
     "dialect": "mysql",
     "port": "3306",
     "charset": "utf8mb4",
