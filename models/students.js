@@ -1,6 +1,6 @@
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define(
-    "EcetStudentForm",
+    "students",
     {
       id: {
         allowNull: false,
@@ -24,6 +24,10 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.TEXT,
         allowNull: false
       },
+      requestType: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
       phoneNumber: {
         type: DataTypes.STRING,
         allowNull: false
@@ -36,35 +40,10 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.STRING,
         allowNull: false
       },
-      polytechnicClgName: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-     
-      polytechnicPassingYear: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-      },
-      polytechnicPercentage: {
-        type: DataTypes.FLOAT,
-        allowNull: false
-      },
-      ECETHallTicketNo: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      ECETRank: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-      },
       courseName: {
         type: DataTypes.STRING,
         allowNull: true
       },
-      // paymentStructure: {
-      //   type: DataTypes.ENUM("One Time Payment", "Annual Payment"),
-      //   allowNull: true
-      // },
       withReferenceOf: {
         type: DataTypes.STRING,
         allowNull: true
@@ -76,7 +55,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     {
       sequelize,
-      tableName: "EcetStudentForm",
+      tableName: "students",
       timestamps: true,
       indexes: [
         {

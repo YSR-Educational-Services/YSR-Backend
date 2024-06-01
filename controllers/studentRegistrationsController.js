@@ -1,3 +1,4 @@
+const { raw } = require("body-parser");
 const databases = require("../config/databases");
 const {
   checkAndWriteHeaders,
@@ -7,7 +8,6 @@ const {
 const createStudentRegistration = async (req, res) => {
   try {
     let inputData = req.body;
-    console.log();
     let studentData = await databases.students.create({
       nameOfApplicant: inputData.nameOfApplicant,
       fatherName: inputData.fatherName,
@@ -97,22 +97,259 @@ const createStudentRegistration = async (req, res) => {
   }
 };
 
+// const getStudentDetailsById = async (req, res) => {
+//   try {
+//     let { id } = req.params;
+//     let studentData = await databases.students.findOne({
+//       attributes: { exclude: ["createdAt", "updatedAt"] },
+//       where: { id }
+//     });
+//     if (!studentData) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Student not found"
+//       });
+//     }
+//     return res.status(200).json({
+//       success: true,
+//       data: studentData
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message
+//     });
+//   }
+// };
+
+// const getAllStudentsDetails = async (req, res) => {
+//   try {
+//     let studentsData = await databases.students.findAll({
+//       attributes: { exclude: ["createdAt", "updatedAt"] }
+//     });
+//     if (!studentsData) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "No Record Found"
+//       });
+//     }
+//     return res.status(200).json({
+//       success: true,
+//       data: studentsData
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message
+//     });
+//   }
+// };
+
+const createStudent = async (req, res) => {
+  try {
+    let inputData = req.body;
+    const mappedReference = inputData.reference.map((reference) => {
+      return `${reference.friendName}: ${reference.friendPhoneNumber}`;
+    });
+    let data = await databases.students.create({
+      nameOfApplicant: inputData.nameOfApplicant,
+      fatherName: inputData.fatherName,
+      dateOfBirth: inputData.dateOfBirth,
+      addressOfCommunication: inputData.addressOfCommunication,
+      phoneNumber: inputData.phoneNumber,
+      aadharNo: inputData.aadharNo,
+      category: inputData.category,
+      requestType: inputData.requestType.toUpperCase(),
+      courseName: inputData.courseName.map((course) => course).join(", "),
+      nameofInstution: inputData.nameofInstution,
+      withReferenceOf: inputData.withReferenceOf,
+      reference: mappedReference.map((referance) => referance).join(",")
+    });
+
+    let qualifyingDetails;
+    if (inputData.requestType.toUpperCase() == "EAPCET") {
+      qualifyingDetails = await databases.eapcet.create({
+        sscSchoolName: inputData.qualifyingDetails[0].sscSchoolName,
+        sscPassingYear: inputData.qualifyingDetails[0].sscPassingYear,
+        sscPercentage: inputData.qualifyingDetails[0].sscPercentage,
+        hscSchoolName: inputData.qualifyingDetails[0].hscSchoolName,
+        hscPassingYear: inputData.qualifyingDetails[0].hscPassingYear,
+        hscPercentage: inputData.qualifyingDetails[0].hscPercentage,
+        EAPCETHallTicketNo: inputData.qualifyingDetails[0].EAPCETHallTicketNo,
+        EAPCETRank: inputData.qualifyingDetails[0].EAPCETRank,
+        _student: data.id
+      });
+    } else if (inputData.requestType.toUpperCase() == "ECET") {
+      qualifyingDetails = await databases.ecet.create({
+        polytechnicClgName: inputData.qualifyingDetails[0].polytechnicClgName,
+        polytechnicPassingYear:
+          inputData.qualifyingDetails[0].polytechnicPassingYear,
+        polytechnicPercentage:
+          inputData.qualifyingDetails[0].polytechnicPercentage,
+        ECETHallTicketNo: inputData.qualifyingDetails[0].ECETHallTicketNo,
+        ECETRank: inputData.qualifyingDetails[0].ECETRank,
+        _student: data.id
+      });
+    }
+    data.qualifyingDetails = qualifyingDetails;
+    if (data) {
+      return res.status(200).json({
+        success: true,
+        data: data,
+        message: "Registrations Done"
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: "Registrations Unsuccess"
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const getAllStudentsData = async (req, res) => {
+  try {
+    const { requestType } = req.params;
+    let studentsData = await databases.students.findAll({
+      attributes: [
+        "id",
+        "createdAt",
+        "nameOfApplicant",
+        "fatherName",
+        "category",
+        "phoneNumber",
+        "withReferenceOf"
+      ],
+      order: [["createdAt", "DESC"]],
+      where: { requestType: requestType.toUpperCase() },
+      raw: true
+    });
+    if (studentsData) {
+      for (let i = 0; i < studentsData.length; i++) {
+        studentsData[i].id = "YSR24" + studentsData[i].id;
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: studentsData
+      });
+    }
+    return res.status(200).json({
+      success: false,
+      message: `no record found`
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const createEapsetDocuments = async (req, res) => {
+  try {
+    let inputData = req.body;
+    inputData.studentId = inputData.studentId.substring(5);
+
+    let documents = await databases.eapcetDecuments.create({
+      sscLongMemo: inputData.sscLongMemo,
+      sscShortMemo: inputData.sscShortMemo,
+      interLongMemo: inputData.interLongMemo,
+      interShortMemo: inputData.interShortMemo,
+      bonafideCertificate: inputData.bonafideCertificate,
+      interTC: inputData.interTC,
+      EAPCETHallTicket: inputData.EAPCETHallTicket,
+      EAPCETRankCard: inputData.EAPCETRankCard,
+      _student: inputData.studentId
+    });
+
+    if (documents) {
+      return res.status(200).json({
+        success: true,
+        message: "Added Successfully.....",
+        data: documents
+      });
+    }
+    return res.status(402).json({
+      success: false,
+      message: "failed..........."
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const getEapcetDocumentsById = async (req, res) => {
+  try {
+    let _student = req.params.studentId;
+    _student = _student.substring(5);
+    let documentsDetails = await databases.eapcetDecuments.findOne({
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      where: { _student },
+      raw: true
+    });
+    if (documentsDetails) {
+      return res.status(200).json({
+        success: true,
+        data: documentsDetails
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      data: null,
+      message: "Data Not Found...."
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 const getStudentDetailsById = async (req, res) => {
   try {
-    let { id } = req.params;
-    let studentData = await databases.students.findOne({
-      attributes: { exclude: ["createdAt", "updatedAt"] },
-      where: { id }
+    let _student = req.params.studentId;
+    _student = _student.substring(5);
+    console.log(_student);
+    let student = await databases.students.findOne({
+      attributes: [
+        "id",
+        "createdAt",
+        "nameOfApplicant",
+        "fatherName",
+        "category",
+        "phoneNumber",
+        "withReferenceOf"
+      ],
+      where: { id: _student },
+      raw: true
     });
-    if (!studentData) {
-      return res.status(404).json({
-        success: false,
-        message: "Student not found"
+    console.log(student);
+    if (student) {
+      student.id = "YSR24" + student.id;
+      return res.status(200).json({
+        success: true,
+        data: student
       });
     }
-    return res.status(200).json({
-      success: true,
-      data: studentData
+    return res.status(404).json({
+      success: false,
+      data: null,
+      message: "Data Not found....."
     });
   } catch (error) {
     console.log(error);
@@ -122,38 +359,12 @@ const getStudentDetailsById = async (req, res) => {
     });
   }
 };
-
-const getAllStudentsDetails = async (req, res) => {
-  try {
-    let studentsData = await databases.students.findAll({
-      attributes: { exclude: ["createdAt", "updatedAt"] }
-    });
-    if (!studentsData) {
-      return res.status(404).json({
-        success: false,
-        message: "No Record Found"
-      });
-    }
-    return res.status(200).json({
-      success: true,
-      data: studentsData
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
-
-
-
-
 
 module.exports = {
   createStudentRegistration,
-  getStudentDetailsById,
-  getAllStudentsDetails,
-  
+  createStudent,
+  getAllStudentsData,
+  createEapsetDocuments,
+  getEapcetDocumentsById,
+  getStudentDetailsById
 };

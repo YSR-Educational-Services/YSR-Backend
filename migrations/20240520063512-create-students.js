@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("EmcetStudentForm", {
+    await queryInterface.createTable("students", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -25,6 +25,10 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false
       },
+      requestType: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       phoneNumber: {
         type: Sequelize.STRING,
         allowNull: false
@@ -37,46 +41,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      sscSchoolName: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      sscPassingYear: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      sscPercentage: {
-        type: Sequelize.FLOAT,
-        allowNull: false
-      },
-      hscSchoolName: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      hscPassingYear: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      hscPercentage: {
-        type: Sequelize.FLOAT,
-        allowNull: false
-      },
-      EMCETHallTicketNo: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      EMCETRank: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
       courseName: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      // paymentStructure: {
-      //   type: Sequelize.ENUM("One Time Payment", "Annual Payment"),
-      //   allowNull: true
-      // },
       withReferenceOf: {
         type: Sequelize.STRING,
         allowNull: true
@@ -96,6 +64,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("EmcetStudentForm");
+    await queryInterface.dropTable("students");
   }
 };
