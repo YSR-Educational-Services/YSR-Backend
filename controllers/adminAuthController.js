@@ -56,7 +56,6 @@ const adminLogin = async (req, res) => {
     const hashPassword = userData.password;
 
     const result = bcrypt.compareSync(password, hashPassword);
-    console.log(userData.adminType);
     if (result) {
       const payload = {
         id: userData.id,
@@ -88,6 +87,15 @@ const addEmployees = async (req, res) => {
   try {
     const { phoneNumber, name } = req.body;
 
+    let checkNumberExits = await databases.employees.findOne({
+      where: { phoneNumber }
+    });
+    if (checkNumberExits) {
+      return res.status(402).json({
+        success: false,
+        message: "Phone Number already Exits........"
+      });
+    }
     let employeesData = await databases.employees.create({
       name,
       phoneNumber
@@ -122,7 +130,6 @@ const getAllEmployees = async (req, res) => {
       raw: true
     });
     if (employeesData.length > 0) {
-      console.log(employeesData);
       for (let i = 0; i < employeesData.length; i++) {
         employeesData[i].id = "YSREMP24" + employeesData[i].id;
       }

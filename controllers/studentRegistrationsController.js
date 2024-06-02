@@ -259,18 +259,37 @@ const createEapsetDocuments = async (req, res) => {
     let inputData = req.body;
     inputData.studentId = inputData.studentId.substring(5);
 
-    let documents = await databases.eapcetDecuments.create({
-      sscLongMemo: inputData.sscLongMemo,
-      sscShortMemo: inputData.sscShortMemo,
-      interLongMemo: inputData.interLongMemo,
-      interShortMemo: inputData.interShortMemo,
-      bonafideCertificate: inputData.bonafideCertificate,
-      interTC: inputData.interTC,
-      EAPCETHallTicket: inputData.EAPCETHallTicket,
-      EAPCETRankCard: inputData.EAPCETRankCard,
-      _student: inputData.studentId
+    let isStudentExits = await databases.eapcetDecuments.findOne({
+      where: { _student: inputData.studentId }
     });
-
+    let documents;
+    if (isStudentExits) {
+      documents = await databases.eapcetDecuments.update(
+        {
+          sscLongMemo: inputData.sscLongMemo,
+          sscShortMemo: inputData.sscShortMemo,
+          interLongMemo: inputData.interLongMemo,
+          interShortMemo: inputData.interShortMemo,
+          bonafideCertificate: inputData.bonafideCertificate,
+          interTC: inputData.interTC,
+          EAPCETHallTicket: inputData.EAPCETHallTicket,
+          EAPCETRankCard: inputData.EAPCETRankCard
+        },
+        { where: { _student: inputData.studentId } }
+      );
+    } else {
+      documents = await databases.eapcetDecuments.create({
+        sscLongMemo: inputData.sscLongMemo,
+        sscShortMemo: inputData.sscShortMemo,
+        interLongMemo: inputData.interLongMemo,
+        interShortMemo: inputData.interShortMemo,
+        bonafideCertificate: inputData.bonafideCertificate,
+        interTC: inputData.interTC,
+        EAPCETHallTicket: inputData.EAPCETHallTicket,
+        EAPCETRankCard: inputData.EAPCETRankCard,
+        _student: inputData.studentId
+      });
+    }
     if (documents) {
       return res.status(200).json({
         success: true,

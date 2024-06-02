@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "admin",
-    "password": "GIFT$day#uK",
-    "database": "Testing2-Testing",
-    "host": "gift4day.ch20y4m24yxm.ap-south-1.rds.amazonaws.com",
+    "username": "u427704821_admin",
+    "password": "4>VrNX^Rb$",
+    "database": "u427704821_YSR_Testing",
+    "host": "2a02:4780:11:1498:0:197e:41f5:3",
     "dialect": "mysql",
     "port": "3306",
     "charset": "utf8mb4",
