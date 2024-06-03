@@ -153,6 +153,7 @@ const createStudent = async (req, res) => {
     const mappedReference = inputData.reference.map((reference) => {
       return `${reference.friendName}: ${reference.friendPhoneNumber}`;
     });
+    console.log(inputData);
     let data = await databases.students.create({
       nameOfApplicant: inputData.nameOfApplicant,
       fatherName: inputData.fatherName,
@@ -161,7 +162,7 @@ const createStudent = async (req, res) => {
       phoneNumber: inputData.phoneNumber,
       aadharNo: inputData.aadharNo,
       category: inputData.category,
-      requestType: inputData.requestType.toUpperCase(),
+      requestType: inputData.requestType?.toUpperCase(),
       courseName: inputData.courseName.map((course) => course).join(", "),
       nameofInstution: inputData.nameofInstution,
       withReferenceOf: inputData.withReferenceOf,
@@ -169,7 +170,7 @@ const createStudent = async (req, res) => {
     });
 
     let qualifyingDetails;
-    if (inputData.requestType.toUpperCase() == "EAPCET") {
+    if (inputData.requestType.toUpperCase() == "  ") {
       qualifyingDetails = await databases.eapcet.create({
         sscSchoolName: inputData.qualifyingDetails[0].sscSchoolName,
         sscPassingYear: inputData.qualifyingDetails[0].sscPassingYear,

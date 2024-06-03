@@ -3,7 +3,7 @@
     "username": "u427704821_admin",
     "password": "4>VrNX^Rb$",
     "database": "u427704821_YSR_Testing",
-    "host": "2a02:4780:11:1498:0:197e:41f5:3",
+    "host": "193.203.184.80",
     "dialect": "mysql",
     "port": "3306",
     "charset": "utf8mb4",
