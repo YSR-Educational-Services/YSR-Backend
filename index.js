@@ -48,7 +48,7 @@ app.options('*', cors(corsOptions)); // Enable preflight requests for all routes
 app.use((err, req, res, next) => {
   if (err) {
     console.error("CORS error:", err.message);
-    return res.status(403).json({ success: false, message: err.message });
+    return res.status(403).json({ success: false, message: err });
   }
   next();
 });
