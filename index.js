@@ -10,12 +10,20 @@ app.use(bodyParser.json());
 
 app.use(express.static("public"));
 
+let whitelist;
+try {
+  whitelist = JSON.parse(process.env.WHITELIST_DOMAINS);
+} catch (error) {
+  console.error("Error parsing WHITELIST_DOMAINS:", error);
+  process.exit(1);
+}
+
 var corsOptions = {
   origin: function (origin, callback) {
     if (process.env.NODE_ENV == "development") {
       callback(null, true);
     } else {
-      if (process.env.WHITE_LIST?.indexOf(origin) !== -1) {
+      if (whitelist?.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
         callback(new Error("Unauthorized Domain"));
@@ -35,7 +43,7 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "*",
     "Access-Control-Allow-Headers":
-      "Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token"
+      "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'"
   });
 
   next();
