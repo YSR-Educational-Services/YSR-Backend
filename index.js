@@ -26,6 +26,7 @@ var corsOptions = {
   origin: function (origin, callback) {
     console.log("Incoming request from origin:", origin);
     if (!origin) {
+      // Handle requests with no origin (e.g., CURL or Postman)
       return callback(null, true);
     }
     if (process.env.NODE_ENV === "development") {
@@ -34,6 +35,7 @@ var corsOptions = {
       if (whitelist?.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
+        console.log("Unauthorized Domain:", origin);
         callback(new Error("Unauthorized Domain"));
       }
     }
@@ -41,25 +43,20 @@ var corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Enable preflight requests for all routes
+app.options('*', cors(corsOptions)); // Enable preflight requests for all routes
 
 app.use((err, req, res, next) => {
   if (err) {
-    return res.status(403).json({ error: err.message });
+    console.error("CORS error:", err.message);
+    return res.status(403).json({ success: false, message: err.message });
   }
   next();
 });
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET,HEAD,OPTIONS,POST,PUT,DELETE"
-  );
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
+  res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   next();
 });
 
