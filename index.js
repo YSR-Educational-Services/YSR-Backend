@@ -15,7 +15,7 @@ var corsOptions = {
     if (process.env.NODE_ENV == "development") {
       callback(null, true);
     } else {
-      if (whitelist?.indexOf(origin) !== -1) {
+      if (process.env.WHITE_LIST?.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
         callback(new Error("Unauthorized Domain"));
