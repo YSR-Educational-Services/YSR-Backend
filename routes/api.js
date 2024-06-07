@@ -46,7 +46,7 @@ router.post("/user-login", adminLogin);
 
 router.post("/emcet-student-registration", craeteEmcetStudent);
 router.get("/emcet-student-data/:id", auth, getEmcetStudentById);
-router.get("/emcet-all-student-data", auth, getListOfEmcet);
+router.get("/emcet-all-student-data", getListOfEmcet);
 router.get("/search-emcet-student", auth, getEmcetStudent);
 
 module.exports = router;

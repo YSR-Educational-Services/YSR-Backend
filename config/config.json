@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "u427704821_admin",
-    "password": "4>VrNX^Rb$",
-    "database": "u427704821_YSR_Testing",
-    "host": "193.203.184.80",
+    "username": "root",
+    "password": "password",
+    "database": "ysr-students-records",
+    "host": "localhost",
     "dialect": "mysql",
     "port": "3306",
     "charset": "utf8mb4",

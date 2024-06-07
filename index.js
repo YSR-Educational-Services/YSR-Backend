@@ -5,7 +5,6 @@ const api = require("./routes/api");
 const app = express();
 const cors = require("cors");
 
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -22,7 +21,7 @@ var corsOptions = {
         callback(new Error("Unauthorized Domain"));
       }
     }
-  },
+  }
 };
 app.use(cors(corsOptions));
 app.use((err, req, res, next) => {
@@ -36,7 +35,7 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "*",
     "Access-Control-Allow-Headers":
-      "'Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token'",
+      "Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token"
   });
 
   next();
@@ -44,7 +43,7 @@ app.use((req, res, next) => {
 
 const init = async () => {
   app.use("/api/v1/user", api);
-  app.use("/api/v1/admin", api)
+  app.use("/api/v1/admin", api);
 
   let port = process.env.PORT || 8080;
   app.listen(port, () => {
@@ -52,4 +51,3 @@ const init = async () => {
   });
 };
 init();
-

@@ -74,7 +74,6 @@ const createStudentRegistration = async (req, res) => {
         "Download_Link"
       ];
       await checkAndWriteHeaders(headerValues);
-      console.log(1);
       const response = await appendToSheet(values);
       // res.status(200).send(response.data);
     } catch (error) {
@@ -150,16 +149,18 @@ const createStudentRegistration = async (req, res) => {
 const createStudent = async (req, res) => {
   try {
     let inputData = req.body;
+    inputData.requestType = "EAPCET";
     const mappedReference = inputData.reference.map((reference) => {
       return `${reference.friendName}: ${reference.friendPhoneNumber}`;
     });
-    console.log(inputData);
+
     let data = await databases.students.create({
       nameOfApplicant: inputData.nameOfApplicant,
       fatherName: inputData.fatherName,
       dateOfBirth: inputData.dateOfBirth,
       addressOfCommunication: inputData.addressOfCommunication,
       phoneNumber: inputData.phoneNumber,
+      phoneNumber1: inputData.phoneNumber1,
       aadharNo: inputData.aadharNo,
       category: inputData.category,
       requestType: inputData.requestType?.toUpperCase(),
@@ -344,7 +345,6 @@ const getStudentDetailsById = async (req, res) => {
   try {
     let _student = req.params.studentId;
     _student = _student.substring(5);
-    console.log(_student);
     let student = await databases.students.findOne({
       attributes: [
         "id",
@@ -358,7 +358,6 @@ const getStudentDetailsById = async (req, res) => {
       where: { id: _student },
       raw: true
     });
-    console.log(student);
     if (student) {
       student.id = "YSR24" + student.id;
       return res.status(200).json({
