@@ -15,7 +15,7 @@ const {
   createStudentRegistration,
   createStudent,
   getAllStudentsData,
-  createEapsetDocuments,
+  createEapcetDocuments,
   getEapcetDocumentsById,
   getStudentDetailsById
 } = require("../controllers/studentRegistrationsController");
@@ -26,7 +26,7 @@ const router = require("express").Router();
 router.post("/student-registrations", createStudentRegistration);
 router.post("/create-student-registration", createStudent);
 router.get("/admin/allType-students-data/:requestType", getAllStudentsData);
-router.post("/admin/add-student-documents", createEapsetDocuments);
+router.post("/admin/add-student-documents", createEapcetDocuments);
 router.get(
   "/admin/student-documents-by-student-id/:studentId",
   getEapcetDocumentsById

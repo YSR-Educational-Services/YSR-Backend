@@ -21,12 +21,10 @@ try {
   process.exit(1);
 }
 
-// CORS configuration with detailed logging
 var corsOptions = {
   origin: function (origin, callback) {
     console.log("Incoming request from origin:", origin);
     if (!origin) {
-      // Handle requests with no origin (e.g., CURL or Postman)
       return callback(null, true);
     }
     if (process.env.NODE_ENV === "development") {
@@ -43,12 +41,12 @@ var corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable preflight requests for all routes
+app.options('*', cors(corsOptions));
 
 app.use((err, req, res, next) => {
   if (err) {
     console.error("CORS error:", err.message);
-    return res.status(403).json({ success: false, message: err });
+    return res.status(403).json({ success: false, message: err.message });
   }
   next();
 });

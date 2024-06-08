@@ -237,7 +237,6 @@ const getAllStudentsData = async (req, res) => {
       for (let i = 0; i < studentsData.length; i++) {
         studentsData[i].id = "YSR24" + studentsData[i].id;
       }
-
       return res.status(200).json({
         success: true,
         data: studentsData
@@ -256,7 +255,7 @@ const getAllStudentsData = async (req, res) => {
   }
 };
 
-const createEapsetDocuments = async (req, res) => {
+const createEapcetDocuments = async (req, res) => {
   try {
     let inputData = req.body;
     inputData.studentId = inputData.studentId.substring(5);
@@ -383,7 +382,7 @@ module.exports = {
   createStudentRegistration,
   createStudent,
   getAllStudentsData,
-  createEapsetDocuments,
+  createEapcetDocuments,
   getEapcetDocumentsById,
   getStudentDetailsById
 };
