@@ -15,10 +15,9 @@ const sequelize = new Sequelize(database, username, password, {
     max: 1,
     min: 0,
     acquire: 1000000,
-    idle: 1000000,
-  },
+    idle: 1000000
+  }
 });
-
 const databases = initModels(sequelize);
 
 module.exports = databases;
