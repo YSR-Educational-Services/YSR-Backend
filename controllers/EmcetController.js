@@ -3,6 +3,7 @@ const databases = require("../config/databases");
 const craeteEmcetStudent = async (req, res) => {
   try {
     let inputData = req.body;
+  
     const mappedReference = inputData.reference.map((reference) => {
       return `${reference.friendName}: ${reference.friendPhoneNumber}`;
     });

@@ -3,7 +3,7 @@ const {
   getEmcetStudentById,
   getListOfEmcet,
   getEmcetStudent
-} = require("../controllers/EmcetControler");
+} = require("../controllers/EmcetController");
 const {
   createAdmin,
   adminLogin,
