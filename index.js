@@ -11,11 +11,10 @@ app.use(bodyParser.json());
 
 app.use(express.static("public"));
 
-// Parse and log whitelist domains
+
 let whitelist;
 try {
   whitelist = JSON.parse(process.env.WHITELIST_DOMAINS);
-  console.log("Whitelist domains:", whitelist);
 } catch (error) {
   console.error("Error parsing WHITELIST_DOMAINS:", error);
   process.exit(1);
@@ -23,7 +22,6 @@ try {
 
 var corsOptions = {
   origin: function (origin, callback) {
-    console.log("Incoming request from origin:", origin);
     if (!origin) {
       return callback(null, true);
     }
@@ -33,7 +31,6 @@ var corsOptions = {
       if (whitelist?.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
-        console.log("Unauthorized Domain:", origin);
         callback(new Error("Unauthorized Domain"));
       }
     }

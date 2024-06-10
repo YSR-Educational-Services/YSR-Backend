@@ -32,7 +32,7 @@ router.get(
   getEapcetDocumentsById
 );
 router.get(
-  "/admin/get-student-details-by-id/:studentId",
+  "/get-student-details-by-id/:studentId",
   getStudentDetailsById
 );
 

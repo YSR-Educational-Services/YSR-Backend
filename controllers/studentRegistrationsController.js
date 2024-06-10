@@ -149,7 +149,6 @@ const createStudentRegistration = async (req, res) => {
 const createStudent = async (req, res) => {
   try {
     let inputData = req.body;
-    inputData.requestType = "EAPCET";
     const mappedReference = inputData.reference.map((reference) => {
       return `${reference.friendName}: ${reference.friendPhoneNumber}`;
     });
@@ -171,7 +170,7 @@ const createStudent = async (req, res) => {
     });
 
     let qualifyingDetails;
-    if (inputData.requestType.toUpperCase() == "  ") {
+    if (inputData.requestType.toUpperCase() == "EAPCET") {
       qualifyingDetails = await databases.eapcet.create({
         sscSchoolName: inputData.qualifyingDetails[0].sscSchoolName,
         sscPassingYear: inputData.qualifyingDetails[0].sscPassingYear,
@@ -345,25 +344,37 @@ const getStudentDetailsById = async (req, res) => {
     let _student = req.params.studentId;
     _student = _student.substring(5);
     let student = await databases.students.findOne({
-      attributes: [
-        "id",
-        "createdAt",
-        "nameOfApplicant",
-        "fatherName",
-        "category",
-        "phoneNumber",
-        "withReferenceOf"
-      ],
+      // attributes: [
+      //   "id",
+      //   "createdAt",
+      //   "nameOfApplicant",
+      //   "fatherName",
+      //   "category",
+      //   "phoneNumber",
+      //   "withReferenceOf"
+      // ],
       where: { id: _student },
       raw: true
     });
+    console.log(student);
     if (student) {
+      if (student.requestType == "EAPCET") {
+        student.qualifyingDetails = await databases.eapcet.findOne({
+          where: { _student }
+        });
+      } else if (student.requestType == "ECET") {
+        student.qualifyingDetails = await databases.eapcet.findOne({
+          where: { _student }
+        });
+      }
+
       student.id = "YSR24" + student.id;
       return res.status(200).json({
         success: true,
         data: student
       });
     }
+    console.log("****", student);
     return res.status(404).json({
       success: false,
       data: null,
