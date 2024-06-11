@@ -10,7 +10,6 @@ const auth = new google.auth.GoogleAuth({
 const range = "Sheet1!A1";
 
 async function appendToSheet(values, spreadsheetId) {
-  console.log(spreadsheetId);
   const sheets = google.sheets({ version: "v4", auth });
   const valueInputOption = "USER_ENTERED";
 
