@@ -44,6 +44,10 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.STRING,
         allowNull: false
       },
+      nameofInstution: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
       courseName: {
         type: DataTypes.STRING,
         allowNull: true

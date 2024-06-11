@@ -44,6 +44,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      nameofInstution: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       courseName: {
         type: Sequelize.STRING,
         allowNull: true

@@ -356,25 +356,23 @@ const getStudentDetailsById = async (req, res) => {
       where: { id: _student },
       raw: true
     });
-    console.log(student);
     if (student) {
       if (student.requestType == "EAPCET") {
         student.qualifyingDetails = await databases.eapcet.findOne({
-          where: { _student }
+          where: { _student },
+          raw: true
         });
       } else if (student.requestType == "ECET") {
         student.qualifyingDetails = await databases.eapcet.findOne({
           where: { _student }
         });
       }
-
       student.id = "YSR24" + student.id;
       return res.status(200).json({
         success: true,
         data: student
       });
     }
-    console.log("****", student);
     return res.status(404).json({
       success: false,
       data: null,
