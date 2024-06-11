@@ -10,6 +10,7 @@ const auth = new google.auth.GoogleAuth({
 const range = "Sheet1!A1";
 
 async function appendToSheet(values, spreadsheetId) {
+  console.log(spreadsheetId);
   const sheets = google.sheets({ version: "v4", auth });
   const valueInputOption = "USER_ENTERED";
 
@@ -40,7 +41,6 @@ async function checkAndWriteHeaders(headerValues, spreadsheetId) {
 
     const rows = response.data.values;
     if (!rows || rows.length === 0 || rows[0].length !== headerValues.length) {
-      // Headers are missing or incorrect, write them
       await sheets.spreadsheets.values.update({
         spreadsheetId,
         range,

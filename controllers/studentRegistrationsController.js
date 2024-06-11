@@ -173,10 +173,11 @@ const createStudent = async (req, res) => {
     inputData.id = "YSR24" + data.id;
     let qualifyingDetails;
     var headerValues;
-    var spreadsheetId;
+    let spreadsheetId;
 
     var values;
     if (inputData.requestType.toUpperCase() === "EAPCET") {
+
       qualifyingDetails = await databases.eapcet.create({
         sscSchoolName: inputData.qualifyingDetails[0].sscSchoolName,
         sscPassingYear: inputData.qualifyingDetails[0].sscPassingYear,
@@ -300,7 +301,6 @@ const createStudent = async (req, res) => {
     }
     data.qualifyingDetails = qualifyingDetails;
     data.id = "YSR24" + data.id;
-
     await checkAndWriteHeaders(headerValues, spreadsheetId);
     await appendToSheet(values, spreadsheetId);
 
@@ -324,10 +324,6 @@ const createStudent = async (req, res) => {
     });
   }
 };
-
-module.exports = createStudent;
-
-module.exports = createStudent;
 
 const getAllStudentsData = async (req, res) => {
   try {

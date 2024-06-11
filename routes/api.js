@@ -31,10 +31,7 @@ router.get(
   "/admin/student-documents-by-student-id/:studentId",
   getEapcetDocumentsById
 );
-router.get(
-  "/get-student-details-by-id/:studentId",
-  getStudentDetailsById
-);
+router.get("/get-student-details-by-id/:studentId", getStudentDetailsById);
 
 router.post("/create-admin", createAdmin);
 router.post("/admin/add-employees", addEmployees);
