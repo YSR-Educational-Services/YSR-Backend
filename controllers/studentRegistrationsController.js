@@ -149,6 +149,7 @@ const createStudentRegistration = async (req, res) => {
 const createStudent = async (req, res) => {
   try {
     let inputData = req.body;
+
     const mappedReference = inputData.reference.map((reference) => {
       return `${reference.friendName}: ${reference.friendPhoneNumber}`;
     });
@@ -166,11 +167,16 @@ const createStudent = async (req, res) => {
       courseName: inputData.courseName.map((course) => course).join(", "),
       nameofInstution: inputData.nameofInstution,
       withReferenceOf: inputData.withReferenceOf,
-      reference: mappedReference.map((referance) => referance).join(",")
+      reference: mappedReference.join(", ") || null
     });
-
+    inputData.downloadLink = `https://ysredu.in/admin/get-student-details-by-id/YSR24${data.id}`;
+    inputData.id = "YSR24" + data.id;
     let qualifyingDetails;
-    if (inputData.requestType.toUpperCase() == "EAPCET") {
+    var headerValues;
+    var spreadsheetId;
+
+    var values;
+    if (inputData.requestType.toUpperCase() === "EAPCET") {
       qualifyingDetails = await databases.eapcet.create({
         sscSchoolName: inputData.qualifyingDetails[0].sscSchoolName,
         sscPassingYear: inputData.qualifyingDetails[0].sscPassingYear,
@@ -182,7 +188,59 @@ const createStudent = async (req, res) => {
         EAPCETRank: inputData.qualifyingDetails[0].EAPCETRank,
         _student: data.id
       });
-    } else if (inputData.requestType.toUpperCase() == "ECET") {
+      spreadsheetId = "1hkN402AjwpAMnt42vEmpERDNG3Mtf8-dQGBjWbJYirs";
+      values = [
+        [
+          inputData.id || " ",
+          inputData.nameOfApplicant || " ",
+          inputData.fatherName || " ",
+          inputData.dateOfBirth || " ",
+          inputData.addressOfCommunication || " ",
+          inputData.phoneNumber || " ",
+          inputData.phoneNumber1 || " ",
+          inputData.aadharNo || " ",
+          inputData.category || " ",
+          inputData.qualifyingDetails[0]?.sscSchoolName || " ",
+          inputData.qualifyingDetails[0]?.sscPassingYear || " ",
+          inputData.qualifyingDetails[0]?.sscPercentage || " ",
+          inputData.qualifyingDetails[0]?.hscSchoolName || " ",
+          inputData.qualifyingDetails[0]?.hscPassingYear || " ",
+          inputData.qualifyingDetails[0]?.hscPercentage || " ",
+          inputData.qualifyingDetails[0]?.EAPCETHallTicketNo || " ",
+          inputData.qualifyingDetails[0]?.EAPCETRank || " ",
+          inputData.nameofInstution || " ",
+          data.courseName || " ",
+          inputData.withReferenceOf || " ",
+          mappedReference.join(", ") || null,
+          inputData.downloadLink
+        ]
+      ];
+
+      headerValues = [
+        "YSR ID",
+        "Name Of Applicant",
+        "Father Name",
+        "Date Of Birth",
+        "Address Of Communication",
+        "Phone Number",
+        "Alternate Phone Number",
+        "Aadhar No",
+        "Category",
+        "SSC School Name",
+        "SSC Passing Year",
+        "SSC Percentage",
+        "HSC School Name",
+        "HSC Passing Year",
+        "HSC Percentage",
+        "EAPCET Hall Ticket No",
+        "EAPCET Rank",
+        "Name Of Institution",
+        "Course Name",
+        "With Reference Of",
+        "Reference",
+        "Download_Link"
+      ];
+    } else if (inputData.requestType.toUpperCase() === "ECET") {
       qualifyingDetails = await databases.ecet.create({
         polytechnicClgName: inputData.qualifyingDetails[0].polytechnicClgName,
         polytechnicPassingYear:
@@ -193,18 +251,70 @@ const createStudent = async (req, res) => {
         ECETRank: inputData.qualifyingDetails[0].ECETRank,
         _student: data.id
       });
+      spreadsheetId = "1oX_vX8TWr_frO-ydcRkFpDpbdNMR4r8FJDU4HRiUBc0";
+      values = [
+        [
+          inputData.id || " ",
+          inputData.nameOfApplicant || " ",
+          inputData.fatherName || " ",
+          inputData.dateOfBirth || " ",
+          inputData.addressOfCommunication || " ",
+          inputData.phoneNumber || " ",
+          inputData.phoneNumber1 || " ",
+          inputData.aadharNo || " ",
+          inputData.category || " ",
+          inputData.qualifyingDetails[0]?.polytechnicClgName || " ",
+          inputData.qualifyingDetails[0]?.polytechnicPassingYear || " ",
+          inputData.qualifyingDetails[0]?.polytechnicPercentage || " ",
+          inputData.qualifyingDetails[0]?.ECETHallTicketNo || " ",
+          inputData.qualifyingDetails[0]?.ECETRank || " ",
+          inputData.nameofInstution || " ",
+          data.courseName || " ",
+          inputData.withReferenceOf || " ",
+          mappedReference.join(", ") || null,
+          inputData.downloadLink
+        ]
+      ];
+
+      headerValues = [
+        "YSR ID",
+        "Name Of Applicant",
+        "Father Name",
+        "Date Of Birth",
+        "Address Of Communication",
+        "Phone Number",
+        "Alternate Phone Number",
+        "Aadhar No",
+        "Category",
+        "Polytechnic School Name",
+        "Polytechnic Passing Year",
+        "Polytechnic Percentage",
+        "ECET Hall Ticket No",
+        "ECET Rank",
+        "Name Of Institution",
+        "Course Name",
+        "With Reference Of",
+        "Reference",
+        "Download_Link"
+      ];
     }
     data.qualifyingDetails = qualifyingDetails;
+    data.id = "YSR24" + data.id;
+
+    await checkAndWriteHeaders(headerValues, spreadsheetId);
+    await appendToSheet(values, spreadsheetId);
+
     if (data) {
       return res.status(200).json({
         success: true,
-        data: data,
-        message: "Registrations Done"
+        data,
+        message: "Registration Done"
       });
     }
+
     return res.status(400).json({
       success: false,
-      message: "Registrations Unsuccess"
+      message: "Registration Unsuccessful"
     });
   } catch (error) {
     console.log(error);
@@ -214,6 +324,10 @@ const createStudent = async (req, res) => {
     });
   }
 };
+
+module.exports = createStudent;
+
+module.exports = createStudent;
 
 const getAllStudentsData = async (req, res) => {
   try {

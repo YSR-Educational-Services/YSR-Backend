@@ -4,13 +4,12 @@ const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS);
 
 const auth = new google.auth.GoogleAuth({
   credentials,
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"]
 });
 
-const spreadsheetId = "1gYdZA9NOgKR8boWknHcamx8NHGlEhY2tG4_K9Uz1pNo";
 const range = "Sheet1!A1";
 
-async function appendToSheet(values) {
+async function appendToSheet(values, spreadsheetId) {
   const sheets = google.sheets({ version: "v4", auth });
   const valueInputOption = "USER_ENTERED";
 
@@ -21,22 +20,22 @@ async function appendToSheet(values) {
       spreadsheetId,
       range,
       valueInputOption,
-      resource,
+      resource
     });
     return res;
   } catch (error) {
-    console.error("Error appending to sheet:", error);
+    console.error("Error appending to sheet:", error.message);
     throw error;
   }
 }
 
-async function checkAndWriteHeaders(headerValues) {
+async function checkAndWriteHeaders(headerValues, spreadsheetId) {
   const sheets = google.sheets({ version: "v4", auth });
 
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "Sheet1!A1:W1",
+      range: "Sheet1!A1:W1"
     });
 
     const rows = response.data.values;
@@ -47,8 +46,8 @@ async function checkAndWriteHeaders(headerValues) {
         range,
         valueInputOption: "RAW",
         resource: {
-          values: [headerValues],
-        },
+          values: [headerValues]
+        }
       });
     }
   } catch (error) {
