@@ -177,7 +177,6 @@ const createStudent = async (req, res) => {
 
     var values;
     if (inputData.requestType.toUpperCase() === "EAPCET") {
-
       qualifyingDetails = await databases.eapcet.create({
         sscSchoolName: inputData.qualifyingDetails[0].sscSchoolName,
         sscPassingYear: inputData.qualifyingDetails[0].sscPassingYear,
@@ -189,7 +188,7 @@ const createStudent = async (req, res) => {
         EAPCETRank: inputData.qualifyingDetails[0].EAPCETRank,
         _student: data.id
       });
-      spreadsheetId = "1hkN402AjwpAMnt42vEmpERDNG3Mtf8-dQGBjWbJYirs";
+      spreadsheetId = "1edepkSuyeylc8IEFf_ym22y56VDfHvkWrlYuUxeFUx8";
       values = [
         [
           inputData.id || " ",
