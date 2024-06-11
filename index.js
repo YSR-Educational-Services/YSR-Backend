@@ -11,7 +11,6 @@ app.use(bodyParser.json());
 
 app.use(express.static("public"));
 
-
 let whitelist;
 try {
   whitelist = JSON.parse(process.env.WHITELIST_DOMAINS);
@@ -38,7 +37,7 @@ var corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use((err, req, res, next) => {
   if (err) {
@@ -50,8 +49,14 @@ app.use((err, req, res, next) => {
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,HEAD,OPTIONS,POST,PUT,DELETE"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
   next();
 });
 
