@@ -367,7 +367,13 @@ const createEapcetDocuments = async (req, res) => {
   try {
     let inputData = req.body;
     inputData.studentId = inputData.studentId.substring(5);
-
+    const { id, ...dataWithoutId } = inputData;
+    if (!dataWithoutId) {
+      return res.status(402).json({
+        success: false,
+        message: "Select alteast One documents."
+      });
+    }
     let isStudentExits = await databases.eapcetDecuments.findOne({
       where: { _student: inputData.studentId }
     });
