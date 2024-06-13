@@ -1,4 +1,3 @@
-const databases = require("../config/databases");
 const bcrypt = require("bcrypt");
 const { validatePassword } = require("../helpers/passwordValidate");
 const createTokens = require("../helpers/jwt.helper");
@@ -83,74 +82,4 @@ const adminLogin = async (req, res) => {
   }
 };
 
-const addEmployees = async (req, res) => {
-  try {
-    const { phoneNumber, name } = req.body;
-
-    let checkNumberExits = await databases.employees.findOne({
-      where: { phoneNumber }
-    });
-    if (checkNumberExits) {
-      return res.status(402).json({
-        success: false,
-        message: "Phone Number already Exits........"
-      });
-    }
-    let employeesData = await databases.employees.create({
-      name,
-      phoneNumber
-    });
-
-    if (employeesData) {
-      return res.status(200).json({
-        success: true,
-        message: "Employee added Successfully......",
-        Data: employeesData
-      });
-    }
-    return res.status(200).json({
-      success: false,
-      message: "Failure......",
-      Data: employeesData
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(501).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
-
-const getAllEmployees = async (req, res) => {
-  try {
-    let employeesData = await databases.employees.findAll({
-      attributes: { exclude: ["createdAt", "updatedAt"] },
-      order: [["createdAt", "DESC"]],
-      raw: true
-    });
-    if (employeesData.length > 0) {
-      for (let i = 0; i < employeesData.length; i++) {
-        employeesData[i].id = "YSREMP24" + employeesData[i].id;
-      }
-
-      return res.status(200).json({
-        success: true,
-        data: employeesData
-      });
-    }
-    return res.status(404).json({
-      success: false,
-      message: `Record Not Found....`,
-      data: null
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(501).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
-
-module.exports = { createAdmin, adminLogin, addEmployees, getAllEmployees };
+module.exports = { createAdmin, adminLogin };
