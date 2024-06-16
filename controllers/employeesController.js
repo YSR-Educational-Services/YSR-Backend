@@ -120,10 +120,6 @@ const getAllEmployees = async (req, res) => {
     if (employeesData.length > 0) {
       for (let i = 0; i < employeesData.length; i++) {
         employeesData[i].id = "YSREMP24" + employeesData[i].id;
-        if (employeesData[i].phoneNumber) {
-          let phoneNumber = employeesData[i].phoneNumber;
-          employeesData[i].phoneNumber = "******" + phoneNumber.slice(-4);
-        }
       }
       return res.status(200).json({
         success: true,
