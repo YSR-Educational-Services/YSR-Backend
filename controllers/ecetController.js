@@ -7,7 +7,6 @@ const craeteEcetStudent = async (req, res) => {
     const mappedReference = inputData.reference.map((reference) => {
       return `${reference.friendName}: ${reference.friendPhoneNumber}`;
     });
-    console.log(mappedReference);
     let studentData = await databases.ecetStudent.create({
       nameOfApplicant: inputData.nameOfApplicant,
       fatherName: inputData.fatherName,

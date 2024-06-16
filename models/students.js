@@ -20,6 +20,10 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.DATEONLY,
         allowNull: false
       },
+      date: {
+        type: DataTypes.DATEONLY,
+        allowNull: false
+      },
       addressOfCommunication: {
         type: DataTypes.TEXT,
         allowNull: false

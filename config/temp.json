@@ -1,13 +1,22 @@
 {
-    "development": {
-      "username": "u427704821_admin",
-      "password": "4>VrNX^Rb$",
-      "database": "u427704821_YSR_Testing",
-      "host": "193.203.184.80",
-      "dialect": "mysql",
-      "port": "3306",
-      "charset": "utf8mb4",
-      "collate": "utf8mb4_unicode_ci"
-    }
+  "development": {
+    "username": "u427704821_adminLive",
+    "password": "1cN=j5g04iW",
+    "database": "u427704821_YSRLive",
+    "host": "srv1398.hstgr.io",
+    "dialect": "mysql",
+    "port": "3306",
+    "charset": "utf8mb4",
+    "collate": "utf8mb4_unicode_ci"
+  },
+  "production": {
+    "username": "u427704821_adminLive",
+    "password": "1cN=j5g04iW",
+    "database": "u427704821_YSRLive",
+    "host": "srv1398.hstgr.io",
+    "dialect": "mysql",
+    "port": "3306",
+    "charset": "utf8mb4",
+    "collate": "utf8mb4_unicode_ci"
   }
-  
+}

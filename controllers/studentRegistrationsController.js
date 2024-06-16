@@ -163,6 +163,7 @@ const createStudent = async (req, res) => {
       phoneNumber1: inputData.phoneNumber1,
       aadharNo: inputData.aadharNo,
       category: inputData.category,
+      date: inputData.date,
       requestType: inputData.requestType?.toUpperCase(),
       courseName: inputData.courseName.map((course) => course).join(", "),
       nameofInstution: inputData.nameofInstution,
@@ -192,6 +193,7 @@ const createStudent = async (req, res) => {
       values = [
         [
           inputData.id || " ",
+          inputData.date || " ",
           inputData.nameOfApplicant || " ",
           inputData.fatherName || " ",
           inputData.dateOfBirth || " ",
@@ -218,6 +220,7 @@ const createStudent = async (req, res) => {
 
       headerValues = [
         "YSR ID",
+        "Date",
         "Name Of Applicant",
         "Father Name",
         "Date Of Birth",
@@ -255,6 +258,7 @@ const createStudent = async (req, res) => {
       values = [
         [
           inputData.id || " ",
+          inputData.date || " ",
           inputData.nameOfApplicant || " ",
           inputData.fatherName || " ",
           inputData.dateOfBirth || " ",
@@ -278,6 +282,7 @@ const createStudent = async (req, res) => {
 
       headerValues = [
         "YSR ID",
+        "Date",
         "Name Of Applicant",
         "Father Name",
         "Date Of Birth",
@@ -330,7 +335,7 @@ const getAllStudentsData = async (req, res) => {
     let studentsData = await databases.students.findAll({
       attributes: [
         "id",
-        "createdAt",
+        "date",
         "nameOfApplicant",
         "fatherName",
         "category",

@@ -74,7 +74,8 @@ const removeEmployees = async (req, res) => {
 
 const updateEmployeeDetails = async (req, res) => {
   try {
-    let { id, name, phoneNumber } = req.query;
+    let { id, name, phoneNumber } = req.body;
+    console.log(id);
     id = id.substring(8);
 
     const checkEmpExist = await databases.employees.findOne({ where: { id } });
@@ -110,6 +111,7 @@ const updateEmployeeDetails = async (req, res) => {
 
 const getAllEmployees = async (req, res) => {
   try {
+    console.log(122);
     let employeesData = await databases.employees.findAll({
       attributes: { exclude: ["createdAt", "updatedAt"] },
       order: [["createdAt", "DESC"]],
