@@ -122,7 +122,7 @@ const getAllEmployees = async (req, res) => {
         employeesData[i].id = "YSREMP24" + employeesData[i].id;
         if (employeesData[i].phoneNumber) {
           let phoneNumber = employeesData[i].phoneNumber;
-          employeesData[i].phoneNumber = "XXXXXX" + phoneNumber.slice(-4);
+          employeesData[i].phoneNumber = "******" + phoneNumber.slice(-4);
         }
       }
       return res.status(200).json({
