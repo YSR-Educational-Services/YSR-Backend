@@ -4,6 +4,7 @@ const {
   checkAndWriteHeaders,
   appendToSheet
 } = require("../helpers/googleSheet");
+const { where } = require("sequelize");
 
 const createStudentRegistration = async (req, res) => {
   try {
@@ -459,6 +460,44 @@ const getEapcetDocumentsById = async (req, res) => {
   }
 };
 
+const getTotalCountOfSubmittedDoc = async (req, res) => {
+  try {
+    let totalEapcetSubmittedDoc = await databases.eapcetDecuments.count();
+    console.log(totalEapcetSubmittedDoc);
+    if (totalEapcetSubmittedDoc) {
+      return res.status(200).json({
+        success: true,
+        data: totalEapcetSubmittedDoc
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const getTotalCountOfWalkIn = async (req, res) => {
+  try {
+    let totalEapcetSubmittedDoc = await databases.eapcetDecuments.count();
+    console.log(totalEapcetSubmittedDoc);
+    if (totalEapcetSubmittedDoc) {
+      return res.status(200).json({
+        success: true,
+        data: totalEapcetSubmittedDoc
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 const getStudentDetailsById = async (req, res) => {
   try {
     let _student = req.params.studentId;
@@ -507,11 +546,52 @@ const getStudentDetailsById = async (req, res) => {
   }
 };
 
+const removeStudentsById = async (req, res) => {
+  try {
+    let { _student } = req.params;
+    _student = _student.substring(5);
+    const studentData = await databases.students.findOne({
+      where: { id: _student },
+      raw: true
+    });
+    if (studentData) {
+      if (studentData.requestType?.toUpperCase() === "EAPCET") {
+        await databases.eapcetDecuments.destroy({
+          where: { _student: _student }
+        });
+        await databases.eapcet.destroy({
+          where: { _student: _student }
+        });
+        await databases.students.destroy({
+          where: { id: _student }
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: "Data Deleted Successfully"
+      });
+      //add condition for ecet also
+    }
+    return res.status(200).json({
+      success: false,
+      message: "Record not found"
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   createStudentRegistration,
   createStudent,
   getAllStudentsData,
   createEapcetDocuments,
   getEapcetDocumentsById,
-  getStudentDetailsById
+  getStudentDetailsById,
+  getTotalCountOfSubmittedDoc,
+  removeStudentsById
 };
