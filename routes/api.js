@@ -47,8 +47,7 @@ router.delete("/admin/remove-employee-by-id/:id", removeEmployees);
 router.put("/admin/update-employee-by-id", updateEmployeeDetails);
 router.get("/admin/total-doc-submitted", getTotalCountOfSubmittedDoc);
 router.delete("/admin/delete-student/:_student", removeStudentsById);
-router.put("/admin/update-student", updateStudentDetails);
-
+router.put("/admin/update-student/:id", updateStudentDetails);
 
 router.post("/user-login", adminLogin);
 

@@ -341,7 +341,8 @@ const getAllStudentsData = async (req, res) => {
         "fatherName",
         "category",
         "phoneNumber",
-        "withReferenceOf"
+        "withReferenceOf",
+        "requestType"
       ],
       order: [["createdAt", "DESC"]],
       where: { requestType: requestType.toUpperCase() },
@@ -463,7 +464,6 @@ const getEapcetDocumentsById = async (req, res) => {
 const getTotalCountOfSubmittedDoc = async (req, res) => {
   try {
     let totalEapcetSubmittedDoc = await databases.eapcetDecuments.count();
-    console.log(totalEapcetSubmittedDoc);
     if (totalEapcetSubmittedDoc) {
       return res.status(200).json({
         success: true,
@@ -482,7 +482,6 @@ const getTotalCountOfSubmittedDoc = async (req, res) => {
 const getTotalCountOfWalkIn = async (req, res) => {
   try {
     let totalEapcetWalkIn = await databases.students.count();
-    console.log(totalEapcetSubmittedDoc);
     if (totalEapcetSubmittedDoc) {
       return res.status(200).json({
         success: true,
@@ -588,8 +587,10 @@ const removeStudentsById = async (req, res) => {
 const updateStudentDetails = async (req, res) => {
   try {
     let inputData = req.body;
+    console.log(inputData);
+    let { id } = req.params;
     let student = await databases.students.findOne({
-      where: { id: inputData.id.replace("YSR24", "") }
+      where: { id: id?.replace("YSR24", "") }
     });
     if (!student) {
       return res.status(404).json({
@@ -598,25 +599,20 @@ const updateStudentDetails = async (req, res) => {
       });
     }
 
-    const mappedReference = inputData.reference.map((reference) => {
-      return `${reference.friendName}: ${reference.friendPhoneNumber}`;
-    });
-
     await student.update({
       nameOfApplicant: inputData.nameOfApplicant,
       fatherName: inputData.fatherName,
       dateOfBirth: inputData.dateOfBirth,
+      date: inputData.date,
       addressOfCommunication: inputData.addressOfCommunication,
       phoneNumber: inputData.phoneNumber,
       phoneNumber1: inputData.phoneNumber1,
       aadharNo: inputData.aadharNo,
       category: inputData.category,
-      date: inputData.date,
       requestType: inputData.requestType?.toUpperCase(),
-      courseName: inputData.courseName.map((course) => course).join(", "),
       nameofInstution: inputData.nameofInstution,
       withReferenceOf: inputData.withReferenceOf,
-      reference: mappedReference.join(", ") || null
+      reference: inputData.reference || null
     });
 
     let qualifyingDetails;
@@ -631,26 +627,26 @@ const updateStudentDetails = async (req, res) => {
       });
       if (!qualifyingDetails) {
         qualifyingDetails = await databases.eapcet.create({
-          sscSchoolName: inputData.qualifyingDetails[0].sscSchoolName,
-          sscPassingYear: inputData.qualifyingDetails[0].sscPassingYear,
-          sscPercentage: inputData.qualifyingDetails[0].sscPercentage,
-          hscSchoolName: inputData.qualifyingDetails[0].hscSchoolName,
-          hscPassingYear: inputData.qualifyingDetails[0].hscPassingYear,
-          hscPercentage: inputData.qualifyingDetails[0].hscPercentage,
-          EAPCETHallTicketNo: inputData.qualifyingDetails[0].EAPCETHallTicketNo,
-          EAPCETRank: inputData.qualifyingDetails[0].EAPCETRank,
+          sscSchoolName: inputData.qualifyingDetails.sscSchoolName,
+          sscPassingYear: inputData.qualifyingDetails.sscPassingYear,
+          sscPercentage: inputData.qualifyingDetails.sscPercentage,
+          hscSchoolName: inputData.qualifyingDetails.hscSchoolName,
+          hscPassingYear: inputData.qualifyingDetails.hscPassingYear,
+          hscPercentage: inputData.qualifyingDetails.hscPercentage,
+          EAPCETHallTicketNo: inputData.qualifyingDetails.EAPCETHallTicketNo,
+          EAPCETRank: inputData.qualifyingDetails.EAPCETRank,
           _student: student.id
         });
       } else {
         await qualifyingDetails.update({
-          sscSchoolName: inputData.qualifyingDetails[0].sscSchoolName,
-          sscPassingYear: inputData.qualifyingDetails[0].sscPassingYear,
-          sscPercentage: inputData.qualifyingDetails[0].sscPercentage,
-          hscSchoolName: inputData.qualifyingDetails[0].hscSchoolName,
-          hscPassingYear: inputData.qualifyingDetails[0].hscPassingYear,
-          hscPercentage: inputData.qualifyingDetails[0].hscPercentage,
-          EAPCETHallTicketNo: inputData.qualifyingDetails[0].EAPCETHallTicketNo,
-          EAPCETRank: inputData.qualifyingDetails[0].EAPCETRank
+          sscSchoolName: inputData.qualifyingDetails.sscSchoolName,
+          sscPassingYear: inputData.qualifyingDetails.sscPassingYear,
+          sscPercentage: inputData.qualifyingDetails.sscPercentage,
+          hscSchoolName: inputData.qualifyingDetails.hscSchoolName,
+          hscPassingYear: inputData.qualifyingDetails.hscPassingYear,
+          hscPercentage: inputData.qualifyingDetails.hscPercentage,
+          EAPCETHallTicketNo: inputData.qualifyingDetails.EAPCETHallTicketNo,
+          EAPCETRank: inputData.qualifyingDetails.EAPCETRank
         });
       }
 
@@ -667,19 +663,19 @@ const updateStudentDetails = async (req, res) => {
           inputData.phoneNumber1 || " ",
           inputData.aadharNo || " ",
           inputData.category || " ",
-          inputData.qualifyingDetails[0]?.sscSchoolName || " ",
-          inputData.qualifyingDetails[0]?.sscPassingYear || " ",
-          inputData.qualifyingDetails[0]?.sscPercentage || " ",
-          inputData.qualifyingDetails[0]?.hscSchoolName || " ",
-          inputData.qualifyingDetails[0]?.hscPassingYear || " ",
-          inputData.qualifyingDetails[0]?.hscPercentage || " ",
-          inputData.qualifyingDetails[0]?.EAPCETHallTicketNo || " ",
-          inputData.qualifyingDetails[0]?.EAPCETRank || " ",
+          inputData.qualifyingDetails.sscSchoolName || " ",
+          inputData.qualifyingDetails.sscPassingYear || " ",
+          inputData.qualifyingDetails.sscPercentage || " ",
+          inputData.qualifyingDetails.hscSchoolName || " ",
+          inputData.qualifyingDetails.hscPassingYear || " ",
+          inputData.qualifyingDetails.hscPercentage || " ",
+          inputData.qualifyingDetails.EAPCETHallTicketNo || " ",
+          inputData.qualifyingDetails.EAPCETRank || " ",
           inputData.nameofInstution || " ",
           student.courseName || " ",
           inputData.withReferenceOf || " ",
-          mappedReference.join(", ") || null,
-          inputData.downloadLink
+          inputData.reference || " ",
+          inputData.downloadLink || " "
         ]
       ];
 
@@ -714,24 +710,24 @@ const updateStudentDetails = async (req, res) => {
       });
       if (!qualifyingDetails) {
         qualifyingDetails = await databases.ecet.create({
-          polytechnicClgName: inputData.qualifyingDetails[0].polytechnicClgName,
+          polytechnicClgName: inputData.qualifyingDetails.polytechnicClgName,
           polytechnicPassingYear:
-            inputData.qualifyingDetails[0].polytechnicPassingYear,
+            inputData.qualifyingDetails.polytechnicPassingYear,
           polytechnicPercentage:
-            inputData.qualifyingDetails[0].polytechnicPercentage,
-          ECETHallTicketNo: inputData.qualifyingDetails[0].ECETHallTicketNo,
-          ECETRank: inputData.qualifyingDetails[0].ECETRank,
+            inputData.qualifyingDetails.polytechnicPercentage,
+          ECETHallTicketNo: inputData.qualifyingDetails.ECETHallTicketNo,
+          ECETRank: inputData.qualifyingDetails.ECETRank,
           _student: student.id
         });
       } else {
         await qualifyingDetails.update({
-          polytechnicClgName: inputData.qualifyingDetails[0].polytechnicClgName,
+          polytechnicClgName: inputData.qualifyingDetails.polytechnicClgName,
           polytechnicPassingYear:
-            inputData.qualifyingDetails[0].polytechnicPassingYear,
+            inputData.qualifyingDetails.polytechnicPassingYear,
           polytechnicPercentage:
-            inputData.qualifyingDetails[0].polytechnicPercentage,
-          ECETHallTicketNo: inputData.qualifyingDetails[0].ECETHallTicketNo,
-          ECETRank: inputData.qualifyingDetails[0].ECETRank
+            inputData.qualifyingDetails.polytechnicPercentage,
+          ECETHallTicketNo: inputData.qualifyingDetails.ECETHallTicketNo,
+          ECETRank: inputData.qualifyingDetails.ECETRank
         });
       }
 
@@ -748,16 +744,16 @@ const updateStudentDetails = async (req, res) => {
           inputData.phoneNumber1 || " ",
           inputData.aadharNo || " ",
           inputData.category || " ",
-          inputData.qualifyingDetails[0]?.polytechnicClgName || " ",
-          inputData.qualifyingDetails[0]?.polytechnicPassingYear || " ",
-          inputData.qualifyingDetails[0]?.polytechnicPercentage || " ",
-          inputData.qualifyingDetails[0]?.ECETHallTicketNo || " ",
-          inputData.qualifyingDetails[0]?.ECETRank || " ",
+          inputData.qualifyingDetails.polytechnicClgName || " ",
+          inputData.qualifyingDetails.polytechnicPassingYear || " ",
+          inputData.qualifyingDetails.polytechnicPercentage || " ",
+          inputData.qualifyingDetails.ECETHallTicketNo || " ",
+          inputData.qualifyingDetails.ECETRank || " ",
           inputData.nameofInstution || " ",
           student.courseName || " ",
           inputData.withReferenceOf || " ",
-          mappedReference.join(", ") || null,
-          inputData.downloadLink
+          inputData.reference || " ",
+          inputData.downloadLink || " "
         ]
       ];
 
