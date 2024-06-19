@@ -481,7 +481,7 @@ const getTotalCountOfSubmittedDoc = async (req, res) => {
 
 const getTotalCountOfWalkIn = async (req, res) => {
   try {
-    let totalEapcetSubmittedDoc = await databases.eapcetDecuments.count();
+    let totalEapcetWalkIn = await databases.students.count();
     console.log(totalEapcetSubmittedDoc);
     if (totalEapcetSubmittedDoc) {
       return res.status(200).json({
@@ -585,6 +585,224 @@ const removeStudentsById = async (req, res) => {
   }
 };
 
+const updateStudentDetails = async (req, res) => {
+  try {
+    let inputData = req.body;
+    let student = await databases.students.findOne({
+      where: { id: inputData.id.replace("YSR24", "") }
+    });
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found"
+      });
+    }
+
+    const mappedReference = inputData.reference.map((reference) => {
+      return `${reference.friendName}: ${reference.friendPhoneNumber}`;
+    });
+
+    await student.update({
+      nameOfApplicant: inputData.nameOfApplicant,
+      fatherName: inputData.fatherName,
+      dateOfBirth: inputData.dateOfBirth,
+      addressOfCommunication: inputData.addressOfCommunication,
+      phoneNumber: inputData.phoneNumber,
+      phoneNumber1: inputData.phoneNumber1,
+      aadharNo: inputData.aadharNo,
+      category: inputData.category,
+      date: inputData.date,
+      requestType: inputData.requestType?.toUpperCase(),
+      courseName: inputData.courseName.map((course) => course).join(", "),
+      nameofInstution: inputData.nameofInstution,
+      withReferenceOf: inputData.withReferenceOf,
+      reference: mappedReference.join(", ") || null
+    });
+
+    let qualifyingDetails;
+    let headerValues;
+    let spreadsheetId;
+    let values;
+
+    // Update qualifying details based on request type
+    if (inputData.requestType.toUpperCase() === "EAPCET") {
+      qualifyingDetails = await databases.eapcet.findOne({
+        where: { _student: student.id }
+      });
+      if (!qualifyingDetails) {
+        qualifyingDetails = await databases.eapcet.create({
+          sscSchoolName: inputData.qualifyingDetails[0].sscSchoolName,
+          sscPassingYear: inputData.qualifyingDetails[0].sscPassingYear,
+          sscPercentage: inputData.qualifyingDetails[0].sscPercentage,
+          hscSchoolName: inputData.qualifyingDetails[0].hscSchoolName,
+          hscPassingYear: inputData.qualifyingDetails[0].hscPassingYear,
+          hscPercentage: inputData.qualifyingDetails[0].hscPercentage,
+          EAPCETHallTicketNo: inputData.qualifyingDetails[0].EAPCETHallTicketNo,
+          EAPCETRank: inputData.qualifyingDetails[0].EAPCETRank,
+          _student: student.id
+        });
+      } else {
+        await qualifyingDetails.update({
+          sscSchoolName: inputData.qualifyingDetails[0].sscSchoolName,
+          sscPassingYear: inputData.qualifyingDetails[0].sscPassingYear,
+          sscPercentage: inputData.qualifyingDetails[0].sscPercentage,
+          hscSchoolName: inputData.qualifyingDetails[0].hscSchoolName,
+          hscPassingYear: inputData.qualifyingDetails[0].hscPassingYear,
+          hscPercentage: inputData.qualifyingDetails[0].hscPercentage,
+          EAPCETHallTicketNo: inputData.qualifyingDetails[0].EAPCETHallTicketNo,
+          EAPCETRank: inputData.qualifyingDetails[0].EAPCETRank
+        });
+      }
+
+      spreadsheetId = "1edepkSuyeylc8IEFf_ym22y56VDfHvkWrlYuUxeFUx8";
+      values = [
+        [
+          inputData.id || " ",
+          inputData.date || " ",
+          inputData.nameOfApplicant || " ",
+          inputData.fatherName || " ",
+          inputData.dateOfBirth || " ",
+          inputData.addressOfCommunication || " ",
+          inputData.phoneNumber || " ",
+          inputData.phoneNumber1 || " ",
+          inputData.aadharNo || " ",
+          inputData.category || " ",
+          inputData.qualifyingDetails[0]?.sscSchoolName || " ",
+          inputData.qualifyingDetails[0]?.sscPassingYear || " ",
+          inputData.qualifyingDetails[0]?.sscPercentage || " ",
+          inputData.qualifyingDetails[0]?.hscSchoolName || " ",
+          inputData.qualifyingDetails[0]?.hscPassingYear || " ",
+          inputData.qualifyingDetails[0]?.hscPercentage || " ",
+          inputData.qualifyingDetails[0]?.EAPCETHallTicketNo || " ",
+          inputData.qualifyingDetails[0]?.EAPCETRank || " ",
+          inputData.nameofInstution || " ",
+          student.courseName || " ",
+          inputData.withReferenceOf || " ",
+          mappedReference.join(", ") || null,
+          inputData.downloadLink
+        ]
+      ];
+
+      headerValues = [
+        "YSR ID",
+        "Date",
+        "Name Of Applicant",
+        "Father Name",
+        "Date Of Birth",
+        "Address Of Communication",
+        "Phone Number",
+        "Alternate Phone Number",
+        "Aadhar No",
+        "Category",
+        "SSC School Name",
+        "SSC Passing Year",
+        "SSC Percentage",
+        "HSC School Name",
+        "HSC Passing Year",
+        "HSC Percentage",
+        "EAPCET Hall Ticket No",
+        "EAPCET Rank",
+        "Name Of Institution",
+        "Course Name",
+        "With Reference Of",
+        "Reference",
+        "Download_Link"
+      ];
+    } else if (inputData.requestType.toUpperCase() === "ECET") {
+      qualifyingDetails = await databases.ecet.findOne({
+        where: { _student: student.id }
+      });
+      if (!qualifyingDetails) {
+        qualifyingDetails = await databases.ecet.create({
+          polytechnicClgName: inputData.qualifyingDetails[0].polytechnicClgName,
+          polytechnicPassingYear:
+            inputData.qualifyingDetails[0].polytechnicPassingYear,
+          polytechnicPercentage:
+            inputData.qualifyingDetails[0].polytechnicPercentage,
+          ECETHallTicketNo: inputData.qualifyingDetails[0].ECETHallTicketNo,
+          ECETRank: inputData.qualifyingDetails[0].ECETRank,
+          _student: student.id
+        });
+      } else {
+        await qualifyingDetails.update({
+          polytechnicClgName: inputData.qualifyingDetails[0].polytechnicClgName,
+          polytechnicPassingYear:
+            inputData.qualifyingDetails[0].polytechnicPassingYear,
+          polytechnicPercentage:
+            inputData.qualifyingDetails[0].polytechnicPercentage,
+          ECETHallTicketNo: inputData.qualifyingDetails[0].ECETHallTicketNo,
+          ECETRank: inputData.qualifyingDetails[0].ECETRank
+        });
+      }
+
+      spreadsheetId = "1oX_vX8TWr_frO-ydcRkFpDpbdNMR4r8FJDU4HRiUBc0";
+      values = [
+        [
+          inputData.id || " ",
+          inputData.date || " ",
+          inputData.nameOfApplicant || " ",
+          inputData.fatherName || " ",
+          inputData.dateOfBirth || " ",
+          inputData.addressOfCommunication || " ",
+          inputData.phoneNumber || " ",
+          inputData.phoneNumber1 || " ",
+          inputData.aadharNo || " ",
+          inputData.category || " ",
+          inputData.qualifyingDetails[0]?.polytechnicClgName || " ",
+          inputData.qualifyingDetails[0]?.polytechnicPassingYear || " ",
+          inputData.qualifyingDetails[0]?.polytechnicPercentage || " ",
+          inputData.qualifyingDetails[0]?.ECETHallTicketNo || " ",
+          inputData.qualifyingDetails[0]?.ECETRank || " ",
+          inputData.nameofInstution || " ",
+          student.courseName || " ",
+          inputData.withReferenceOf || " ",
+          mappedReference.join(", ") || null,
+          inputData.downloadLink
+        ]
+      ];
+
+      headerValues = [
+        "YSR ID",
+        "Date",
+        "Name Of Applicant",
+        "Father Name",
+        "Date Of Birth",
+        "Address Of Communication",
+        "Phone Number",
+        "Alternate Phone Number",
+        "Aadhar No",
+        "Category",
+        "Polytechnic School Name",
+        "Polytechnic Passing Year",
+        "Polytechnic Percentage",
+        "ECET Hall Ticket No",
+        "ECET Rank",
+        "Name Of Institution",
+        "Course Name",
+        "With Reference Of",
+        "Reference",
+        "Download_Link"
+      ];
+    }
+
+    // Update the spreadsheet with new details
+    await checkAndWriteHeaders(headerValues, spreadsheetId);
+    await appendToSheet(values, spreadsheetId);
+
+    return res.status(200).json({
+      success: true,
+      data: student,
+      message: "Update successful"
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   createStudentRegistration,
   createStudent,
@@ -593,5 +811,6 @@ module.exports = {
   getEapcetDocumentsById,
   getStudentDetailsById,
   getTotalCountOfSubmittedDoc,
-  removeStudentsById
+  removeStudentsById,
+  updateStudentDetails
 };

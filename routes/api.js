@@ -23,7 +23,8 @@ const {
   getEapcetDocumentsById,
   getStudentDetailsById,
   getTotalCountOfSubmittedDoc,
-  removeStudentsById
+  removeStudentsById,
+  updateStudentDetails
 } = require("../controllers/studentRegistrationsController");
 const { auth } = require("../middlewares/auth");
 
@@ -45,7 +46,9 @@ router.get("/admin/get-all-employees", getAllEmployees);
 router.delete("/admin/remove-employee-by-id/:id", removeEmployees);
 router.put("/admin/update-employee-by-id", updateEmployeeDetails);
 router.get("/admin/total-doc-submitted", getTotalCountOfSubmittedDoc);
-router.delete("/admin//delete-student/:_student", removeStudentsById);
+router.delete("/admin/delete-student/:_student", removeStudentsById);
+router.put("/admin/update-student", updateStudentDetails);
+
 
 router.post("/user-login", adminLogin);
 
