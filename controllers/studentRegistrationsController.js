@@ -353,21 +353,40 @@ const createStudent = async (req, res) => {
 const getAllStudentsData = async (req, res) => {
   try {
     const { requestType } = req.params;
-    let studentsData = await databases.students.findAll({
-      attributes: [
-        "id",
-        "date",
-        "nameOfApplicant",
-        "fatherName",
-        "category",
-        "phoneNumber",
-        "withReferenceOf",
-        "requestType"
-      ],
-      order: [["createdAt", "DESC"]],
-      where: { requestType: requestType.toUpperCase() },
-      raw: true
-    });
+    let studentsData;
+    if (requestType.toUpperCase() === "ALL") {
+      studentsData = await databases.students.findAll({
+        attributes: [
+          "id",
+          "date",
+          "nameOfApplicant",
+          "fatherName",
+          "category",
+          "phoneNumber",
+          "withReferenceOf",
+          "requestType"
+        ],
+        order: [["createdAt", "DESC"]],
+        raw: true
+      });
+    } else {
+      studentsData = await databases.students.findAll({
+        attributes: [
+          "id",
+          "date",
+          "nameOfApplicant",
+          "fatherName",
+          "category",
+          "phoneNumber",
+          "withReferenceOf",
+          "requestType"
+        ],
+        order: [["createdAt", "DESC"]],
+        where: { requestType: requestType.toUpperCase() },
+        raw: true
+      });
+    }
+
     if (studentsData) {
       for (let i = 0; i < studentsData.length; i++) {
         studentsData[i].id = "YSR24" + studentsData[i].id;
