@@ -25,7 +25,7 @@ const {
   getTotalCountOfSubmittedDoc,
   removeStudentsById,
   updateStudentDetails,
-  searchStudent
+  searchStudents
 } = require("../controllers/studentRegistrationsController");
 const { auth } = require("../middlewares/auth");
 
@@ -49,7 +49,7 @@ router.put("/admin/update-employee-by-id", updateEmployeeDetails);
 router.get("/admin/total-doc-submitted", getTotalCountOfSubmittedDoc);
 router.delete("/admin/delete-student/:_student", removeStudentsById);
 router.put("/admin/update-student/:id", updateStudentDetails);
-router.post("/admin/search-student/:searchData", searchStudent);
+router.post("/admin/search-student/:searchData", searchStudents);
 
 router.post("/user-login", adminLogin);
 

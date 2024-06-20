@@ -818,7 +818,7 @@ const updateStudentDetails = async (req, res) => {
   }
 };
 
-const searchStudent = async (req, res) => {
+const searchStudents = async (req, res) => {
   try {
     const { searchData } = req.params;
 
@@ -826,10 +826,10 @@ const searchStudent = async (req, res) => {
       const students = await databases.students.findAll({
         where: {
           [Op.or]: [
-            { nameOfApplicant: { [Op.iLike]: `%${searchData}%` } },
-            { fatherName: { [Op.iLike]: `%${searchData}%` } },
-            { withReferenceOf: { [Op.iLike]: `%${searchData}%` } },
-            { phoneNumber: { [Op.iLike]: `%${searchData}%` } }
+            { nameOfApplicant: { [Op.like]: `%${searchData}%` } },
+            { fatherName: { [Op.like]: `%${searchData}%` } },
+            { withReferenceOf: { [Op.like]: `%${searchData}%` } },
+            { phoneNumber: { [Op.like]: `%${searchData}%` } }
           ]
         }
       });
@@ -864,5 +864,5 @@ module.exports = {
   getTotalCountOfSubmittedDoc,
   removeStudentsById,
   updateStudentDetails,
-  searchStudent
+  searchStudents
 };
