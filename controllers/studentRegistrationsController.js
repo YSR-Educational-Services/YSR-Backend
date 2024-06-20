@@ -4,7 +4,7 @@ const {
   checkAndWriteHeaders,
   appendToSheet
 } = require("../helpers/googleSheet");
-const { where } = require("sequelize");
+const { where, Op } = require("sequelize");
 
 const createStudentRegistration = async (req, res) => {
   try {
@@ -154,6 +154,26 @@ const createStudent = async (req, res) => {
     const mappedReference = inputData.reference.map((reference) => {
       return `${reference.friendName}: ${reference.friendPhoneNumber}`;
     });
+    let isStudentExits;
+    if (inputData.requestType.toUpperCase() === "EAPCET") {
+      isStudentExits = await databases.eapcet.findOne({
+        where: {
+          EAPCETHallTicketNo: inputData.qualifyingDetails[0].EAPCETHallTicketNo
+        }
+      });
+    } else if (inputData.requestType.toUpperCase() === "ECET") {
+      isStudentExits = await databases.ecet.findOne({
+        where: {
+          ECETHallTicketNo: inputData.qualifyingDetails[0].ECETHallTicketNo
+        }
+      });
+    }
+    if (isStudentExits) {
+      return res.status(400).json({
+        success: true,
+        message: "Sorry This Hall Ticket Number is already Exist"
+      });
+    }
 
     let data = await databases.students.create({
       nameOfApplicant: inputData.nameOfApplicant,
@@ -587,7 +607,6 @@ const removeStudentsById = async (req, res) => {
 const updateStudentDetails = async (req, res) => {
   try {
     let inputData = req.body;
-    console.log(inputData);
     let { id } = req.params;
     let student = await databases.students.findOne({
       where: { id: id?.replace("YSR24", "") }
@@ -799,6 +818,42 @@ const updateStudentDetails = async (req, res) => {
   }
 };
 
+const searchStudent = async (req, res) => {
+  try {
+    const { searchData } = req.params;
+
+    if (searchData) {
+      const students = await databases.students.findAll({
+        where: {
+          [Op.or]: [
+            { nameOfApplicant: { [Op.iLike]: `%${searchData}%` } },
+            { fatherName: { [Op.iLike]: `%${searchData}%` } },
+            { withReferenceOf: { [Op.iLike]: `%${searchData}%` } },
+            { phoneNumber: { [Op.iLike]: `%${searchData}%` } }
+          ]
+        }
+      });
+      if (students) {
+        return res.status(200).json({
+          success: true,
+          data: students
+        });
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: "Student not found..."
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   createStudentRegistration,
   createStudent,
@@ -808,5 +863,6 @@ module.exports = {
   getStudentDetailsById,
   getTotalCountOfSubmittedDoc,
   removeStudentsById,
-  updateStudentDetails
+  updateStudentDetails,
+  searchStudent
 };
