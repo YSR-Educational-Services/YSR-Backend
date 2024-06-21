@@ -40,7 +40,6 @@ router.get(
   getEapcetDocumentsById
 );
 router.get("/get-student-details-by-id/:studentId", getStudentDetailsById);
-
 router.post("/create-admin", createAdmin);
 router.post("/admin/add-employees", addEmployees);
 router.get("/admin/get-all-employees", getAllEmployees);
@@ -52,8 +51,6 @@ router.put("/admin/update-student/:id", updateStudentDetails);
 router.get("/admin/search-student/:searchData", searchStudents);
 
 router.post("/user-login", adminLogin);
-
-//=====================================================
 
 router.post("/emcet-student-registration", craeteEmcetStudent);
 router.get("/emcet-student-data/:id", getEmcetStudentById);
