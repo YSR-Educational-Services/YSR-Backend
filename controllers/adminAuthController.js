@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const { validatePassword } = require("../helpers/passwordValidate");
 const createTokens = require("../helpers/jwt.helper");
+const databases = require("../config/databases");
 
 const createAdmin = async (req, res) => {
   try {

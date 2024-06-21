@@ -842,7 +842,7 @@ const searchStudents = async (req, res) => {
     const { searchData } = req.params;
 
     if (searchData) {
-      const students = await databases.students.findAll({
+      let students = await databases.students.findAll({
         where: {
           [Op.or]: [
             { nameOfApplicant: { [Op.like]: `%${searchData}%` } },
@@ -853,6 +853,7 @@ const searchStudents = async (req, res) => {
         }
       });
       if (students) {
+        students.id = "YSR24" + students.id;
         return res.status(200).json({
           success: true,
           data: students
