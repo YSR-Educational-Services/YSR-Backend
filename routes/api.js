@@ -29,7 +29,7 @@ const {
 } = require("../controllers/studentRegistrationsController");
 const { auth } = require("../middlewares/auth");
 
-const  router = require("express").Router();
+const router = require("express").Router();
 
 router.post("/student-registrations", createStudentRegistration);
 router.post("/create-student-registration", createStudent);

@@ -853,7 +853,9 @@ const searchStudents = async (req, res) => {
         }
       });
       if (students) {
-        students.id = "YSR24" + students.id;
+        for (let i = 0; i < students.length; i++) {
+          students[i].id = "YSR24" + students[i].id;
+        }
         return res.status(200).json({
           success: true,
           data: students
