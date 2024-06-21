@@ -25,7 +25,7 @@ module.exports = {
         type: Sequelize.ENUM("ORIGINAL", "XEROX"),
         allowNull: false
       },
-      bonafideCertificate: {
+      SSCBonafideCertificate: {
         type: Sequelize.ENUM("ORIGINAL", "XEROX"),
         allowNull: false
       },

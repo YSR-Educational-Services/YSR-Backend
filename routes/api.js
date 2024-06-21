@@ -43,7 +43,7 @@ router.get("/get-student-details-by-id/:studentId", getStudentDetailsById);
 
 router.post("/create-admin", createAdmin);
 router.post("/admin/add-employees", addEmployees);
-router.get("/admin/get-all-employees", auth, getAllEmployees);
+router.get("/admin/get-all-employees", getAllEmployees);
 router.delete("/admin/remove-employee-by-id/:id", removeEmployees);
 router.put("/admin/update-employee-by-id", updateEmployeeDetails);
 router.get("/admin/total-doc-submitted", getTotalCountOfSubmittedDoc);
@@ -56,7 +56,7 @@ router.post("/user-login", adminLogin);
 //=====================================================
 
 router.post("/emcet-student-registration", craeteEmcetStudent);
-router.get("/emcet-student-data/:id", auth, getEmcetStudentById);
+router.get("/emcet-student-data/:id", getEmcetStudentById);
 router.get("/emcet-all-student-data", getListOfEmcet);
 router.get("/search-emcet-student", auth, getEmcetStudent);
 

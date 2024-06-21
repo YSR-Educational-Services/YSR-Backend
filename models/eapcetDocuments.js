@@ -24,9 +24,29 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.ENUM("ORIGINAL", "XEROX"),
         allowNull: false
       },
-      bonafideCertificate: {
+      SSCBonafideCertificate: {
         type: DataTypes.ENUM("ORIGINAL", "XEROX"),
         allowNull: false
+      },
+      adhaarCardXerox: {
+        type: DataTypes.ENUM("ORIGINAL", "XEROX"),
+        allowNull: true
+      },
+      incomeCertificate: {
+        type: DataTypes.ENUM("ORIGINAL", "XEROX"),
+        allowNull: true
+      },
+      castCertificate: {
+        type: DataTypes.ENUM("ORIGINAL", "XEROX"),
+        allowNull: true
+      },
+      ROC: {
+        type: DataTypes.ENUM("ORIGINAL", "XEROX"),
+        allowNull: true
+      },
+      HSCBonafideCertificate: {
+        type: DataTypes.ENUM("ORIGINAL", "XEROX"),
+        allowNull: true
       },
       interTC: {
         type: DataTypes.ENUM("ORIGINAL", "XEROX"),

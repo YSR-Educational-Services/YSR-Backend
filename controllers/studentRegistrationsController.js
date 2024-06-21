@@ -412,6 +412,7 @@ const getAllStudentsData = async (req, res) => {
 const createEapcetDocuments = async (req, res) => {
   try {
     let inputData = req.body;
+    console.log(inputData);
     inputData.studentId = inputData.studentId.substring(5);
     const { id, ...dataWithoutId } = inputData;
     if (!dataWithoutId) {
@@ -425,27 +426,42 @@ const createEapcetDocuments = async (req, res) => {
     });
     let documents;
     if (isStudentExits) {
-      documents = await databases.eapcetDecuments.update(
+      const updated = await databases.eapcetDecuments.update(
         {
           sscLongMemo: inputData.sscLongMemo,
           sscShortMemo: inputData.sscShortMemo,
           interLongMemo: inputData.interLongMemo,
           interShortMemo: inputData.interShortMemo,
-          bonafideCertificate: inputData.bonafideCertificate,
+          SSCBonafideCertificate: inputData.SSCBonafideCertificate,
           interTC: inputData.interTC,
+          adhaarCardXerox: inputData.adhaarCardXerox,
+          incomeCertificate: inputData.incomeCertificate,
+          castCertificate: inputData.castCertificate,
+          ROC: inputData.ROC,
+          HSCBonafideCertificate: inputData.HSCBonafideCertificate,
           EAPCETHallTicket: inputData.EAPCETHallTicket,
           EAPCETRankCard: inputData.EAPCETRankCard
         },
         { where: { _student: inputData.studentId } }
       );
+      if (updated) {
+        documents = await databases.eapcetDecuments.findOne({
+          where: { _student: inputData.studentId }
+        });
+      }
     } else {
       documents = await databases.eapcetDecuments.create({
         sscLongMemo: inputData.sscLongMemo,
         sscShortMemo: inputData.sscShortMemo,
         interLongMemo: inputData.interLongMemo,
         interShortMemo: inputData.interShortMemo,
-        bonafideCertificate: inputData.bonafideCertificate,
+        SSCBonafideCertificate: inputData.SSCBonafideCertificate,
         interTC: inputData.interTC,
+        adhaarCardXerox: inputData.adhaarCardXerox,
+        incomeCertificate: inputData.incomeCertificate,
+        castCertificate: inputData.castCertificate,
+        ROC: inputData.ROC,
+        HSCBonafideCertificate: inputData.HSCBonafideCertificate,
         EAPCETHallTicket: inputData.EAPCETHallTicket,
         EAPCETRankCard: inputData.EAPCETRankCard,
         _student: inputData.studentId
