@@ -850,7 +850,8 @@ const searchStudents = async (req, res) => {
             { withReferenceOf: { [Op.like]: `%${searchData}%` } },
             { phoneNumber: { [Op.like]: `%${searchData}%` } }
           ]
-        }
+        },
+        raw: true
       });
       if (students) {
         for (let i = 0; i < students.length; i++) {

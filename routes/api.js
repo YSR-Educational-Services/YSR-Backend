@@ -43,13 +43,13 @@ router.get("/get-student-details-by-id/:studentId", getStudentDetailsById);
 
 router.post("/create-admin", createAdmin);
 router.post("/admin/add-employees", addEmployees);
-router.get("/admin/get-all-employees", getAllEmployees);
+router.get("/admin/get-all-employees", auth, getAllEmployees);
 router.delete("/admin/remove-employee-by-id/:id", removeEmployees);
 router.put("/admin/update-employee-by-id", updateEmployeeDetails);
 router.get("/admin/total-doc-submitted", getTotalCountOfSubmittedDoc);
 router.delete("/admin/delete-student/:_student", removeStudentsById);
 router.put("/admin/update-student/:id", updateStudentDetails);
-router.post("/admin/search-student/:searchData", searchStudents);
+router.get("/admin/search-student/:searchData", searchStudents);
 
 router.post("/user-login", adminLogin);
 
