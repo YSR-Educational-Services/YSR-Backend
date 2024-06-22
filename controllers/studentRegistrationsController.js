@@ -326,8 +326,8 @@ const createStudent = async (req, res) => {
     }
     data.qualifyingDetails = qualifyingDetails;
     data.id = "YSR24" + data.id;
-    await checkAndWriteHeaders(headerValues, spreadsheetId);
-    await appendToSheet(values, spreadsheetId);
+    //await checkAndWriteHeaders(headerValues, spreadsheetId);
+    //await appendToSheet(values, spreadsheetId);
 
     if (data) {
       return res.status(200).json({
@@ -643,9 +643,10 @@ const removeStudentsById = async (req, res) => {
 const updateStudentDetails = async (req, res) => {
   try {
     let inputData = req.body;
-    let { id } = req.params;
+    let id = req.params.id;
+    id = id.substring(5);
     let student = await databases.students.findOne({
-      where: { id: id?.replace("YSR24", "") }
+      where: { id: id }
     });
     if (!student) {
       return res.status(404).json({
@@ -653,7 +654,6 @@ const updateStudentDetails = async (req, res) => {
         message: "Student not found"
       });
     }
-
     await student.update({
       nameOfApplicant: inputData.nameOfApplicant,
       fatherName: inputData.fatherName,
@@ -669,16 +669,15 @@ const updateStudentDetails = async (req, res) => {
       withReferenceOf: inputData.withReferenceOf,
       reference: inputData.reference || null
     });
-
     let qualifyingDetails;
     let headerValues;
     let spreadsheetId;
     let values;
-
     // Update qualifying details based on request type
     if (inputData.requestType.toUpperCase() === "EAPCET") {
       qualifyingDetails = await databases.eapcet.findOne({
-        where: { _student: student.id }
+        where: { _student: id },
+        raw: true
       });
       if (!qualifyingDetails) {
         qualifyingDetails = await databases.eapcet.create({
@@ -693,22 +692,24 @@ const updateStudentDetails = async (req, res) => {
           _student: student.id
         });
       } else {
-        await qualifyingDetails.update({
-          sscSchoolName: inputData.qualifyingDetails.sscSchoolName,
-          sscPassingYear: inputData.qualifyingDetails.sscPassingYear,
-          sscPercentage: inputData.qualifyingDetails.sscPercentage,
-          hscSchoolName: inputData.qualifyingDetails.hscSchoolName,
-          hscPassingYear: inputData.qualifyingDetails.hscPassingYear,
-          hscPercentage: inputData.qualifyingDetails.hscPercentage,
-          EAPCETHallTicketNo: inputData.qualifyingDetails.EAPCETHallTicketNo,
-          EAPCETRank: inputData.qualifyingDetails.EAPCETRank
-        });
+        await databases.eapcet.update(
+          {
+            sscSchoolName: inputData.qualifyingDetails.sscSchoolName,
+            sscPassingYear: inputData.qualifyingDetails.sscPassingYear,
+            sscPercentage: inputData.qualifyingDetails.sscPercentage,
+            hscSchoolName: inputData.qualifyingDetails.hscSchoolName,
+            hscPassingYear: inputData.qualifyingDetails.hscPassingYear,
+            hscPercentage: inputData.qualifyingDetails.hscPercentage,
+            EAPCETHallTicketNo: inputData.qualifyingDetails.EAPCETHallTicketNo,
+            EAPCETRank: inputData.qualifyingDetails.EAPCETRank
+          },
+          { where: { _student: id } }
+        );
       }
-
       spreadsheetId = "1edepkSuyeylc8IEFf_ym22y56VDfHvkWrlYuUxeFUx8";
       values = [
         [
-          inputData.id || " ",
+          "YSR24" + id || " ",
           inputData.date || " ",
           inputData.nameOfApplicant || " ",
           inputData.fatherName || " ",
@@ -775,7 +776,7 @@ const updateStudentDetails = async (req, res) => {
           _student: student.id
         });
       } else {
-        await qualifyingDetails.update({
+        await databases.ecet.update({
           polytechnicClgName: inputData.qualifyingDetails.polytechnicClgName,
           polytechnicPassingYear:
             inputData.qualifyingDetails.polytechnicPassingYear,
@@ -789,7 +790,7 @@ const updateStudentDetails = async (req, res) => {
       spreadsheetId = "1oX_vX8TWr_frO-ydcRkFpDpbdNMR4r8FJDU4HRiUBc0";
       values = [
         [
-          inputData.id || " ",
+          "YSR" + id || " ",
           inputData.date || " ",
           inputData.nameOfApplicant || " ",
           inputData.fatherName || " ",
@@ -836,9 +837,10 @@ const updateStudentDetails = async (req, res) => {
       ];
     }
 
-    // Update the spreadsheet with new details
-    await checkAndWriteHeaders(headerValues, spreadsheetId);
-    await appendToSheet(values, spreadsheetId);
+    //let temp1 = await checkAndWriteHeaders(headerValues, spreadsheetId);
+    // console.log(temp1);
+    // let temp2 = await appendToSheet(values, spreadsheetId);
+    // console.log("temp1=", temp1, "temp2", temp2);
 
     return res.status(200).json({
       success: true,
@@ -846,7 +848,7 @@ const updateStudentDetails = async (req, res) => {
       message: "Update successful"
     });
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
     return res.status(500).json({
       success: false,
       message: error.message

@@ -1,58 +1,59 @@
-const { google } = require("googleapis");
+// require("dotenv").config();
+// const { google } = require("googleapis");
+// console.log(JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS));
+// const credentials = "";
 
-const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS);
+// const auth = new google.auth.GoogleAuth({
+//   credentials,
+//   scopes: ["https://www.googleapis.com/auth/spreadsheets"]
+// });
 
-const auth = new google.auth.GoogleAuth({
-  credentials,
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"]
-});
+// const range = "Sheet1!A1";
 
-const range = "Sheet1!A1";
+// async function appendToSheet(values, spreadsheetId) {
+//   const sheets = google.sheets({ version: "v4", auth });
+//   const valueInputOption = "USER_ENTERED";
 
-async function appendToSheet(values, spreadsheetId) {
-  const sheets = google.sheets({ version: "v4", auth });
-  const valueInputOption = "USER_ENTERED";
+//   const resource = { values };
 
-  const resource = { values };
+//   try {
+//     const res = await sheets.spreadsheets.values.append({
+//       spreadsheetId,
+//       range,
+//       valueInputOption,
+//       resource
+//     });
+//     return res;
+//   } catch (error) {
+//     console.error("Error appending to sheet:", error.message);
+//     throw error;
+//   }
+// }
 
-  try {
-    const res = await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range,
-      valueInputOption,
-      resource
-    });
-    return res;
-  } catch (error) {
-    console.error("Error appending to sheet:", error.message);
-    throw error;
-  }
-}
+// async function checkAndWriteHeaders(headerValues, spreadsheetId) {
+//   const sheets = google.sheets({ version: "v4", auth });
 
-async function checkAndWriteHeaders(headerValues, spreadsheetId) {
-  const sheets = google.sheets({ version: "v4", auth });
+//   try {
+//     const response = await sheets.spreadsheets.values.get({
+//       spreadsheetId,
+//       range: "Sheet1!A1:W1"
+//     });
 
-  try {
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: "Sheet1!A1:W1"
-    });
+//     const rows = response.data.values;
+//     if (!rows || rows.length === 0 || rows[0].length !== headerValues.length) {
+//       await sheets.spreadsheets.values.update({
+//         spreadsheetId,
+//         range,
+//         valueInputOption: "RAW",
+//         resource: {
+//           values: [headerValues]
+//         }
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Error checking/writing headers:", error);
+//     throw error;
+//   }
+// }
 
-    const rows = response.data.values;
-    if (!rows || rows.length === 0 || rows[0].length !== headerValues.length) {
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range,
-        valueInputOption: "RAW",
-        resource: {
-          values: [headerValues]
-        }
-      });
-    }
-  } catch (error) {
-    console.error("Error checking/writing headers:", error);
-    throw error;
-  }
-}
-
-module.exports = { checkAndWriteHeaders, appendToSheet };
+// module.exports = { checkAndWriteHeaders, appendToSheet };
