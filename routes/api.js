@@ -42,7 +42,7 @@ router.get(
 router.get("/get-student-details-by-id/:studentId", getStudentDetailsById);
 router.post("/create-admin", createAdmin);
 router.post("/admin/add-employees", addEmployees);
-router.get("/admin/get-all-employees", getAllEmployees);
+router.get("/admin/get-all-employees", auth, getAllEmployees);
 router.delete("/admin/remove-employee-by-id/:id", removeEmployees);
 router.put("/admin/update-employee-by-id", updateEmployeeDetails);
 router.get("/admin/total-doc-submitted", getTotalCountOfSubmittedDoc);
@@ -56,5 +56,9 @@ router.post("/emcet-student-registration", craeteEmcetStudent);
 router.get("/emcet-student-data/:id", getEmcetStudentById);
 router.get("/emcet-all-student-data", getListOfEmcet);
 router.get("/search-emcet-student", auth, getEmcetStudent);
+
+router.get("/home", (req, res) => {
+  res.send("<h1>Hello Sir </h1>");
+});
 
 module.exports = router;
