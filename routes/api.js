@@ -42,7 +42,7 @@ router.get(
 router.get("/get-student-details-by-id/:studentId", getStudentDetailsById);
 router.post("/create-admin", createAdmin);
 router.post("/admin/add-employees", addEmployees);
-router.get("/admin/get-all-employees", auth, getAllEmployees);
+router.get("/admin/get-all-employees", getAllEmployees);
 router.delete("/admin/remove-employee-by-id/:id", removeEmployees);
 router.put("/admin/update-employee-by-id", updateEmployeeDetails);
 router.get("/admin/total-doc-submitted", getTotalCountOfSubmittedDoc);
