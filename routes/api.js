@@ -5,6 +5,9 @@ const {
   getEmcetStudent
 } = require("../controllers/EmcetController");
 const {
+  getAllDocSubmittedStudentsId
+} = require("../controllers/OverviewsController");
+const {
   createAdmin,
   adminLogin
 } = require("../controllers/adminAuthController");
@@ -39,7 +42,11 @@ router.get(
   "/admin/student-documents-by-student-id/:studentId",
   getEapcetDocumentsById
 );
-router.get("/get-student-details-by-id/:studentId", getStudentDetailsById);
+router.get(
+  "/get-student-details-by-id/:studentId",
+  auth,
+  getStudentDetailsById
+);
 router.post("/create-admin", createAdmin);
 router.post("/admin/add-employees", addEmployees);
 router.get("/admin/get-all-employees", getAllEmployees);
@@ -49,16 +56,16 @@ router.get("/admin/total-doc-submitted", getTotalCountOfSubmittedDoc);
 router.delete("/admin/delete-student/:_student", removeStudentsById);
 router.put("/admin/update-student/:id", updateStudentDetails);
 router.get("/admin/search-student/:searchData", searchStudents);
-
+router.get("/documents-submitted-ids", getAllDocSubmittedStudentsId);
 router.post("/user-login", adminLogin);
 
 router.post("/emcet-student-registration", craeteEmcetStudent);
 router.get("/emcet-student-data/:id", getEmcetStudentById);
 router.get("/emcet-all-student-data", getListOfEmcet);
-router.get("/search-emcet-student", auth, getEmcetStudent);
+router.get("/search-emcet-student", getEmcetStudent);
 
-router.get("/home", (req, res) => {
-  res.send("<h1>Hello Sir </h1>");
+router.get("*", (req, res) => {
+  res.send("<h1>Bad Credentail URL Not found  </h1>");
 });
 
 module.exports = router;

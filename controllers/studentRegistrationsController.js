@@ -364,7 +364,8 @@ const getAllStudentsData = async (req, res) => {
           "category",
           "phoneNumber",
           "withReferenceOf",
-          "requestType"
+          "requestType",
+          "EAPCETrank"
         ],
         order: [["createdAt", "DESC"]],
         raw: true
@@ -408,6 +409,8 @@ const getAllStudentsData = async (req, res) => {
     });
   }
 };
+
+
 
 const createEapcetDocuments = async (req, res) => {
   try {
@@ -621,6 +624,7 @@ const removeStudentsById = async (req, res) => {
           where: { id: _student }
         });
       }
+      console.log(11111);
       return res.status(200).json({
         success: true,
         message: "Data Deleted Successfully"

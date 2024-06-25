@@ -63,7 +63,12 @@ module.exports = function (sequelize, DataTypes) {
       reference: {
         type: DataTypes.TEXT,
         allowNull: true
-      }
+      },
+      isDocumentsSubmitted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: true
+      },
     },
     {
       sequelize,

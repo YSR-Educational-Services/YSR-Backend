@@ -60,6 +60,11 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true
       },
+      isDocumentsSubmitted: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

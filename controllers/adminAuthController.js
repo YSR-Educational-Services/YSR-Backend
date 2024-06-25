@@ -66,7 +66,7 @@ const adminLogin = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        data: { userData, token }
+        token
       });
     } else {
       return res.status(404).json({
