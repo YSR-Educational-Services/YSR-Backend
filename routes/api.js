@@ -5,8 +5,10 @@ const {
   getEmcetStudent
 } = require("../controllers/EmcetController");
 const {
-  getAllDocSubmittedStudentsId
-} = require("../controllers/OverviewsController");
+  getAllDocSubmittedStudentsId,
+  getAllDocSubmittedStudentsData,
+  getAllStudentsDetails
+} = require("../controllers/overviewsController");
 const {
   createAdmin,
   adminLogin
@@ -56,8 +58,9 @@ router.get("/admin/total-doc-submitted", getTotalCountOfSubmittedDoc);
 router.delete("/admin/delete-student/:_student", removeStudentsById);
 router.put("/admin/update-student/:id", updateStudentDetails);
 router.get("/admin/search-student/:searchData", searchStudents);
-router.get("/documents-submitted-ids", getAllDocSubmittedStudentsId);
+router.get("/admin/documents-submitted-data", getAllDocSubmittedStudentsData);
 router.post("/user-login", adminLogin);
+router.get("/add-details-in-google-sheet", getAllStudentsDetails);
 
 router.post("/emcet-student-registration", craeteEmcetStudent);
 router.get("/emcet-student-data/:id", getEmcetStudentById);
