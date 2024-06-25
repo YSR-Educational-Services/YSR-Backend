@@ -45,7 +45,6 @@ router.get(
 );
 router.get(
   "/get-student-details-by-id/:studentId",
-  auth,
   getStudentDetailsById
 );
 router.post("/create-admin", createAdmin);
