@@ -154,6 +154,9 @@ const createStudent = async (req, res) => {
     const mappedReference = inputData.reference.map((reference) => {
       return `${reference.friendName}: ${reference.friendPhoneNumber}`;
     });
+    if (!(inputData.requestType.toUpperCase() === "EAPCET")) {
+      inputData.requestType.toUpperCase() = "EAPCET"
+    }
     let isStudentExits;
     if (inputData.requestType.toUpperCase() === "EAPCET") {
       isStudentExits = await databases.eapcet.findOne({

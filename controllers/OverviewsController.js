@@ -52,17 +52,18 @@ const getAllDocSubmittedStudentsData = async (req, res) => {
           where: { _student: studentsData[i].id },
           raw: true
         });
-        // if (!qualifyingDetails) {
-        //   qualifyingDetails.EAPCETRank = "Null";
-        //   qualifyingDetails.EAPCETHallTicketNo = "Null";
-        // }
-
-        // if (!qualifyingDetails.EAPCETRank) {
-        //   qualifyingDetails.EAPCETRank = "Null";
-        // }
-        // if (!qualifyingDetails.EAPCETHallTicketNo) {
-        //   qualifyingDetails.EAPCETHallTicketNo = "Null";
-        // }
+        if (!qualifyingDetails) {
+          qualifyingDetails = {
+            EAPCETRank: "N/A",
+            EAPCETHallTicketNo: "N/A"
+          };
+        }
+        if (!qualifyingDetails.EAPCETRank) {
+          qualifyingDetails.EAPCETRank = "N/A";
+        }
+        if (!qualifyingDetails.EAPCETHallTicketNo) {
+          qualifyingDetails.EAPCETHallTicketNo = "N/A";
+        }
         studentsData[i].id = "YSR24" + studentsData[i].id;
         studentsData[i].qualifyingDetails = qualifyingDetails;
       }

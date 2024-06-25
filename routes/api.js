@@ -4,10 +4,10 @@ const {
   getListOfEmcet,
   getEmcetStudent
 } = require("../controllers/EmcetController");
-// const {
-//   getAllDocSubmittedStudentsData,
-//   getAllStudentsDetails
-// } = require("../controllers/overviewsController");
+const {
+  getAllDocSubmittedStudentsData,
+  getAllStudentsDetails
+} = require("../controllers/overviewsController");
 const {
   createAdmin,
   adminLogin
@@ -43,10 +43,7 @@ router.get(
   "/admin/student-documents-by-student-id/:studentId",
   getEapcetDocumentsById
 );
-router.get(
-  "/get-student-details-by-id/:studentId",
-  getStudentDetailsById
-);
+router.get("/get-student-details-by-id/:studentId", getStudentDetailsById);
 router.post("/create-admin", createAdmin);
 router.post("/admin/add-employees", addEmployees);
 router.get("/admin/get-all-employees", getAllEmployees);
@@ -56,7 +53,7 @@ router.get("/admin/total-doc-submitted", getTotalCountOfSubmittedDoc);
 router.delete("/admin/delete-student/:_student", removeStudentsById);
 router.put("/admin/update-student/:id", updateStudentDetails);
 router.get("/admin/search-student/:searchData", searchStudents);
-// router.get("/admin/documents-submitted-data", getAllDocSubmittedStudentsData);
+router.get("/admin/documents-submitted-data", getAllDocSubmittedStudentsData);
 router.post("/user-login", adminLogin);
 // router.get("/add-details-in-google-sheet", getAllStudentsDetails);
 
