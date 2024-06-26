@@ -368,7 +368,6 @@ const getAllStudentsData = async (req, res) => {
           "phoneNumber",
           "withReferenceOf",
           "requestType",
-          "EAPCETrank"
         ],
         order: [["createdAt", "DESC"]],
         raw: true

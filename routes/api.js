@@ -4,10 +4,12 @@ const {
   getListOfEmcet,
   getEmcetStudent
 } = require("../controllers/EmcetController");
-// const {
-//   getAllDocSubmittedStudentsData,
-//   getAllStudentsDetails
-// } = require("../controllers/overviewsController");
+const {
+  getAllDocSubmittedStudentsData,
+  getAllStudentsDetails,
+  getAllWalkInsStudents
+} = require("../controllers/OverviewsController");
+
 const {
   createAdmin,
   adminLogin
@@ -53,14 +55,16 @@ router.get("/admin/total-doc-submitted", getTotalCountOfSubmittedDoc);
 router.delete("/admin/delete-student/:_student", removeStudentsById);
 router.put("/admin/update-student/:id", updateStudentDetails);
 router.get("/admin/search-student/:searchData", searchStudents);
-// router.get("/admin/documents-submitted-data", getAllDocSubmittedStudentsData);
+router.get("/admin/documents-submitted-data", getAllDocSubmittedStudentsData);
+router.get("/admin/walk-ins-students", getAllWalkInsStudents);
 router.post("/user-login", adminLogin);
-// router.get("/add-details-in-google-sheet", getAllStudentsDetails);
+router.get("/add-details-in-google-sheet", getAllStudentsDetails);
 
 router.post("/emcet-student-registration", craeteEmcetStudent);
 router.get("/emcet-student-data/:id", getEmcetStudentById);
 router.get("/emcet-all-student-data", getListOfEmcet);
 router.get("/search-emcet-student", getEmcetStudent);
+// router.get("/total-submitted-doc", getTodtalCountOfSubmittedDoc);
 
 router.get("*", (req, res) => {
   res.send("<h1>Bad Credentail URL Not found  </h1>");
