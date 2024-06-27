@@ -61,4 +61,5 @@ async function checkAndWriteHeaders(headerValues) {
   }
 }
 
+
 module.exports = { checkAndWriteHeaders, appendToSheet };
