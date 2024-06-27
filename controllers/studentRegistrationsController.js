@@ -433,6 +433,7 @@ const createEapcetDocuments = async (req, res) => {
     if (isStudentExits) {
       const updated = await databases.eapcetDecuments.update(
         {
+          date: inputData.date,
           sscLongMemo: inputData.sscLongMemo,
           sscShortMemo: inputData.sscShortMemo,
           interLongMemo: inputData.interLongMemo,
@@ -456,6 +457,7 @@ const createEapcetDocuments = async (req, res) => {
       }
     } else {
       documents = await databases.eapcetDecuments.create({
+        date: inputData.date,
         sscLongMemo: inputData.sscLongMemo,
         sscShortMemo: inputData.sscShortMemo,
         interLongMemo: inputData.interLongMemo,
@@ -491,6 +493,39 @@ const createEapcetDocuments = async (req, res) => {
     });
   }
 };
+
+const updateEapcetDocumentsById = async (req, res)=>{
+  try {
+    let _student = req.params.id;
+    console.log(_student);
+    let {date} = req.body;
+    _student = _student.substring(5)
+    let isStudentDoctExits = await databases.eapcetDecuments.findOne({where: {_student}});
+    if (!isStudentDoctExits) {
+      return res.status(404).json({
+        success: true,
+        message: "Data Not Found With This Student ID"
+      })
+    }
+    let updated = await databases.eapcetDecuments.update({date},{where: {_student}});
+    if (updated>=1) {
+      return res.status(200).json({
+        success: true,
+        message: "Updated Successfully...."
+      })
+    }
+    return res.status(400).json({
+      success: true,
+      message: "Updated Unsuccessfull...."
+    })
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
 
 const getEapcetDocumentsById = async (req, res) => {
   try {
@@ -912,5 +947,6 @@ module.exports = {
   getTotalCountOfSubmittedDoc,
   removeStudentsById,
   updateStudentDetails,
-  searchStudents
+  searchStudents,
+  updateEapcetDocumentsById, // just for short term use 
 };

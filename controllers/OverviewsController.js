@@ -12,9 +12,10 @@ const getAllDocSubmittedStudentsId = async (req, res) => {
       raw: true
     });
     if (docSubmittedStudentIds) {
+      let length = docSubmittedStudentIds.length;
       return res.status(200).json({
         success: false,
-        data: docSubmittedStudentIds
+        data: { docSubmittedStudentIds, length }
       });
     }
   } catch (error) {
@@ -99,7 +100,6 @@ const getAllDocSubmittedStudentsData = async (req, res) => {
               } else if (newKey === "SSCBonafideCertificate") {
                 newKey = "SSC-BONAFIDE";
               }
-
               filteredDoc[newKey.toUpperCase()] = studentsOriginalDoc[key];
             }
           }
@@ -107,6 +107,7 @@ const getAllDocSubmittedStudentsData = async (req, res) => {
         studentsData[i].id = "YSR24" + studentsData[i].id;
         studentsData[i].studentsOriginalDoc = filteredDoc;
         studentsData[i].qualifyingDetails = qualifyingDetails;
+        studentsData[i].docSubmittedDate = studentsOriginalDoc.date;
       }
       return res.status(200).json({
         success: true,
@@ -128,14 +129,28 @@ const getAllDocSubmittedStudentsData = async (req, res) => {
 
 const getAllStudentsDetails = async (req, res) => {
   try {
-    let studentsData = await databases.students.findAll({
-      where: { isDocumentsSubmitted: true },
-      raw: true
+    let temp = await databases.eapcetDecuments.findAll({ raw: true });
+    let studentsData = [];
+
+    const studentPromises = temp.map(async (student) => {
+      const tempStudent = await databases.students.findOne({
+        where: { id: student._student },
+        raw: true
+      });
+      studentsData.push(tempStudent);
     });
 
-    if (studentsData) {
+    await Promise.all(studentPromises);
+
+    // Proceed only if studentsData is not empty
+    if (studentsData.length > 0) {
       for (let i = 0; i < studentsData.length; i++) {
         let studentsOriginalDoc = await databases.eapcetDecuments.findOne({
+          where: { _student: studentsData[i].id },
+          raw: true
+        });
+
+        let qualifyingDetails = await databases.eapcet.findOne({
           where: { _student: studentsData[i].id },
           raw: true
         });
@@ -144,21 +159,31 @@ const getAllStudentsDetails = async (req, res) => {
         if (studentsOriginalDoc) {
           for (const key in studentsOriginalDoc) {
             if (studentsOriginalDoc[key] === "ORIGINAL") {
-              filteredDoc[key.toUpperCase()] = studentsOriginalDoc[key];
+              let newKey = key;
+              if (newKey === "HSCBonafideCertificate") {
+                newKey = "INTER-BONAFIDE";
+              } else if (newKey === "castCertificate") {
+                newKey = "CASTECERTIFICATE";
+              } else if (newKey === "SSCBonafideCertificate") {
+                newKey = "SSC-BONAFIDE";
+              }
+              filteredDoc[newKey.toUpperCase()] = studentsOriginalDoc[key];
             }
           }
         }
 
+        // Update student data with additional details
+        studentsData[i].id = "YSR24" + studentsData[i].id;
         studentsData[i].studentsOriginalDoc = filteredDoc;
-
-        studentsData[i].HallTicketNumber =
-          studentsData[i].qualifyingDetails?.EAPCETHallTicketNo || "";
-        studentsData[i].EapcetRank =
-          studentsData[i].qualifyingDetails?.EAPCETRank || "";
+        studentsData[i].docsDate = studentsOriginalDoc.date;
+        studentsData[i].HallTicketNumber = qualifyingDetails.EAPCETHallTicketNo;
+        studentsData[i].EapcetRank = qualifyingDetails.EAPCETRank;
       }
 
+      // Map student data to values for Google Sheets
       const values = studentsData.map((student) => [
         student.id,
+        student.date,
         student.nameOfApplicant,
         student.fatherName,
         student.dateOfBirth,
@@ -167,11 +192,13 @@ const getAllStudentsDetails = async (req, res) => {
         student.HallTicketNumber,
         student.EapcetRank,
         student.withReferenceOf,
+        student.docsDate,
         JSON.stringify(student.studentsOriginalDoc) // Convert object to string if needed
       ]);
 
       const headerValues = [
         "Student Id",
+        "Date Of Walk-In",
         "Name Of Applicant",
         "Father Name",
         "Date Of Birth",
@@ -180,18 +207,16 @@ const getAllStudentsDetails = async (req, res) => {
         "Hall Ticket Number",
         "Eapcet Rank",
         "With Reference of",
+        "Date Of Docs Collected",
         "Submitted Documents"
       ];
 
-      // Send JSON response with studentsData
-      // res.json(studentsData.studentsOriginalDoc);
-
       // Write to Google Sheet
-      const response1 = await checkAndWriteHeaders(headerValues);
-      const response2 = await appendToSheet(values);
-      return res.status(400).json({
-        response1,
-        response2
+      await checkAndWriteHeaders(headerValues);
+      await appendToSheet(values);
+      return res.status(200).json({
+        success: true,
+        message: "Data Added in Google sheets"
       });
     } else {
       res
@@ -223,7 +248,6 @@ const getAllWalkInsStudents = async (req, res) => {
       order: [["createdAt", "DESC"]],
       raw: true
     });
-    studentsData.totalWalkIns = await databases;
     if (studentsData) {
       for (let i = 0; i < studentsData.length; i++) {
         let qualifyingDetails = await databases.eapcet.findOne({
@@ -264,19 +288,125 @@ const getAllWalkInsStudents = async (req, res) => {
   }
 };
 
-const getWalkInStudents = async (req, res) => {
+const getLoginPeddingStudents = async (req, res) => {
   try {
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
+    let studentsData = await databases.students.findAll({
+      attributes: [
+        "id",
+        "date",
+        "nameOfApplicant",
+        "fatherName",
+        "category",
+        "phoneNumber",
+        "withReferenceOf",
+        "requestType"
+      ],
+      order: [["createdAt", "DESC"]],
+      where: { isLoggedin: false },
+      raw: true
+    });
+    if (studentsData) {
+      for (let i = 0; i < studentsData.length; i++) {
+        let qualifyingDetails = await databases.eapcet.findOne({
+          attributes: ["EAPCETRank", "EAPCETHallTicketNo"],
+          where: { _student: studentsData[i].id },
+          raw: true
+        });
+        if (!qualifyingDetails) {
+          qualifyingDetails = {
+            EAPCETRank: "N/A",
+            EAPCETHallTicketNo: "N/A"
+          };
+        }
+        if (!qualifyingDetails.EAPCETRank) {
+          qualifyingDetails.EAPCETRank = "N/A";
+        }
+        if (!qualifyingDetails.EAPCETHallTicketNo) {
+          qualifyingDetails.EAPCETHallTicketNo = "N/A";
+        }
+        studentsData[i].id = "YSR24" + studentsData[i].id;
+        studentsData[i].qualifyingDetails = qualifyingDetails;
+      }
+      return res.status(200).json({
+        success: true,
+        data: studentsData
+      });
+    }
+    return res.status(404).json({
       success: false,
-      message: "Error processing students details: " + error.message
+      message: `no record found`
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
     });
   }
 };
+
+const getLoggedinStudents = async (req, res) => {
+  try {
+    let studentsData = await databases.students.findAll({
+      attributes: [
+        "id",
+        "date",
+        "nameOfApplicant",
+        "fatherName",
+        "category",
+        "phoneNumber",
+        "withReferenceOf",
+        "requestType"
+      ],
+      order: [["createdAt", "DESC"]],
+      where: { isLoggedin: true },
+      raw: true
+    });
+    if (studentsData) {
+      for (let i = 0; i < studentsData.length; i++) {
+        let qualifyingDetails = await databases.eapcet.findOne({
+          attributes: ["EAPCETRank", "EAPCETHallTicketNo"],
+          where: { _student: studentsData[i].id },
+          raw: true
+        });
+        if (!qualifyingDetails) {
+          qualifyingDetails = {
+            EAPCETRank: "N/A",
+            EAPCETHallTicketNo: "N/A"
+          };
+        }
+        if (!qualifyingDetails.EAPCETRank) {
+          qualifyingDetails.EAPCETRank = "N/A";
+        }
+        if (!qualifyingDetails.EAPCETHallTicketNo) {
+          qualifyingDetails.EAPCETHallTicketNo = "N/A";
+        }
+        studentsData[i].id = "YSR24" + studentsData[i].id;
+        studentsData[i].qualifyingDetails = qualifyingDetails;
+      }
+      return res.status(200).json({
+        success: true,
+        data: studentsData
+      });
+    }
+    return res.status(404).json({
+      success: false,
+      message: `no record found`
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllDocSubmittedStudentsId,
   getAllDocSubmittedStudentsData,
+  getLoginPeddingStudents,
+  getLoggedinStudents,
   getAllStudentsDetails,
   getTodtalCountOfSubmittedDoc,
   getAllWalkInsStudents

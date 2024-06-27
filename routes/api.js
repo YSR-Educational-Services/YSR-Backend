@@ -8,7 +8,10 @@ const {
 const {
   getAllDocSubmittedStudentsData,
   getAllStudentsDetails,
-  getAllWalkInsStudents
+  getAllWalkInsStudents,
+  getLoginPeddingStudents,
+  getLoggedinStudents,
+  getAllDocSubmittedStudentsId
 } = require("../controllers/OverviewsController");
 
 const {
@@ -32,7 +35,8 @@ const {
   getTotalCountOfSubmittedDoc,
   removeStudentsById,
   updateStudentDetails,
-  searchStudents
+  searchStudents,
+  updateEapcetDocumentsById
 } = require("../controllers/studentRegistrationsController");
 const { auth } = require("../middlewares/auth");
 
@@ -59,13 +63,16 @@ router.get("/admin/search-student/:searchData", searchStudents);
 router.get("/admin/documents-submitted-data", getAllDocSubmittedStudentsData);
 router.get("/admin/walk-ins-students", getAllWalkInsStudents);
 router.post("/user-login", adminLogin);
-router.get("/add-details-in-google-sheet", getAllStudentsDetails);
+router.get("/add-details-in-google-sheet", getAllStudentsDetails); // this just temp file
+router.get("/admin/login-pendding-students", getLoginPeddingStudents);
+router.get("/admin/loggedin-students", getLoggedinStudents);
 
 router.post("/emcet-student-registration", craeteEmcetStudent);
 router.get("/emcet-student-data/:id", getEmcetStudentById);
 router.get("/emcet-all-student-data", getListOfEmcet);
 router.get("/search-emcet-student", getEmcetStudent);
-// router.get("/total-submitted-doc", getTodtalCountOfSubmittedDoc);
+router.get("/total-submitted-doc-ids", getAllDocSubmittedStudentsId);
+router.put("/admin/update-eapcet-doc/:id", updateEapcetDocumentsById);
 
 router.get("*", (req, res) => {
   res.send("<h1>Bad Credentail URL Not found  </h1>");

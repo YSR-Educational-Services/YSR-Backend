@@ -69,6 +69,11 @@ module.exports = function (sequelize, DataTypes) {
         defaultValue: false,
         allowNull: true
       },
+      isLoggedin: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: true
+      }
     },
     {
       sequelize,

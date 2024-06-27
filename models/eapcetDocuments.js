@@ -67,6 +67,10 @@ module.exports = function (sequelize, DataTypes) {
           model: "students",
           key: "id"
         }
+      },
+      date: {
+        type: DataTypes.DATEONLY,
+        allowNull: false
       }
     },
     {
