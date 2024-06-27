@@ -171,8 +171,6 @@ const getAllStudentsDetails = async (req, res) => {
             }
           }
         }
-
-        // Update student data with additional details
         studentsData[i].id = "YSR24" + studentsData[i].id;
         studentsData[i].studentsOriginalDoc = filteredDoc;
         studentsData[i].docsDate = studentsOriginalDoc.date;
