@@ -48,6 +48,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
+      courseLevel: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       courseName: {
         type: Sequelize.STRING,
         allowNull: true

@@ -11,6 +11,9 @@ const getAllDocSubmittedStudentsId = async (req, res) => {
       order: [["createdAt", "DESC"]],
       raw: true
     });
+    // let docSubmittedStudentIds = await databases.students.findAll({
+    //   where: { isDocumentsSubmitted: true }
+    // });
     if (docSubmittedStudentIds) {
       let length = docSubmittedStudentIds.length;
       return res.status(200).json({
@@ -27,7 +30,7 @@ const getAllDocSubmittedStudentsId = async (req, res) => {
   }
 };
 
-const getTodtalCountOfSubmittedDoc = async (req, res) => {
+const getTotalCountOfSubmittedDoc = async (req, res) => {
   try {
     let totalCount = await databases.students.count({
       where: { isDocumentsSubmitted: true }
@@ -57,6 +60,7 @@ const getAllDocSubmittedStudentsData = async (req, res) => {
         "fatherName",
         "category",
         "phoneNumber",
+        "phoneNumber1",
         "withReferenceOf",
         "requestType"
       ],
@@ -88,9 +92,13 @@ const getAllDocSubmittedStudentsData = async (req, res) => {
           where: { _student: studentsData[i].id },
           raw: true
         });
+        // console.log(studentsOriginalDoc);
         let filteredDoc = {};
         if (studentsOriginalDoc) {
           for (const key in studentsOriginalDoc) {
+            if (studentsOriginalDoc._student == "501") {
+              console.log(studentsOriginalDoc);
+            }
             if (studentsOriginalDoc[key] === "ORIGINAL") {
               let newKey = key;
               if (newKey === "HSCBonafideCertificate") {
@@ -107,7 +115,7 @@ const getAllDocSubmittedStudentsData = async (req, res) => {
         studentsData[i].id = "YSR24" + studentsData[i].id;
         studentsData[i].studentsOriginalDoc = filteredDoc;
         studentsData[i].qualifyingDetails = qualifyingDetails;
-        studentsData[i].docSubmittedDate = studentsOriginalDoc.date;
+        studentsData[i].docSubmittedDate = studentsOriginalDoc?.date;
       }
       return res.status(200).json({
         success: true,
@@ -142,7 +150,6 @@ const getAllStudentsDetails = async (req, res) => {
 
     await Promise.all(studentPromises);
 
-    // Proceed only if studentsData is not empty
     if (studentsData.length > 0) {
       for (let i = 0; i < studentsData.length; i++) {
         let studentsOriginalDoc = await databases.eapcetDecuments.findOne({
@@ -178,7 +185,6 @@ const getAllStudentsDetails = async (req, res) => {
         studentsData[i].EapcetRank = qualifyingDetails.EAPCETRank;
       }
 
-      // Map student data to values for Google Sheets
       const values = studentsData.map((student) => [
         student.id,
         student.date,
@@ -186,6 +192,7 @@ const getAllStudentsDetails = async (req, res) => {
         student.fatherName,
         student.dateOfBirth,
         student.phoneNumber,
+        student.phoneNumber1,
         student.category,
         student.HallTicketNumber,
         student.EapcetRank,
@@ -201,6 +208,7 @@ const getAllStudentsDetails = async (req, res) => {
         "Father Name",
         "Date Of Birth",
         "Phone Number",
+        "Alternate Number",
         "Category",
         "Hall Ticket Number",
         "Eapcet Rank",
@@ -240,6 +248,7 @@ const getAllWalkInsStudents = async (req, res) => {
         "fatherName",
         "category",
         "phoneNumber",
+        "phoneNumber1",
         "withReferenceOf",
         "requestType"
       ],
@@ -286,7 +295,7 @@ const getAllWalkInsStudents = async (req, res) => {
   }
 };
 
-const getLoginPeddingStudents = async (req, res) => {
+const getLoginPendingStudents = async (req, res) => {
   try {
     let studentsData = await databases.students.findAll({
       attributes: [
@@ -296,6 +305,7 @@ const getLoginPeddingStudents = async (req, res) => {
         "fatherName",
         "category",
         "phoneNumber",
+        "phoneNumber1",
         "withReferenceOf",
         "requestType"
       ],
@@ -353,6 +363,7 @@ const getLoggedinStudents = async (req, res) => {
         "fatherName",
         "category",
         "phoneNumber",
+        "phoneNumber1",
         "withReferenceOf",
         "requestType"
       ],
@@ -400,12 +411,40 @@ const getLoggedinStudents = async (req, res) => {
   }
 };
 
+const getOverviewsCount = async (req, res) => {
+  try {
+    let totalWalkIns = await databases.students.count();
+    let totalCollectedDocs = await databases.eapcetDecuments.count();
+    let totalLoggedIn = await databases.students.count({
+      where: { isLoggedin: true }
+    });
+    let totalPendingLogIn = await databases.students.count({
+      where: { isLoggedin: false }
+    });
+    return res.status(200).json({
+      success: true,
+      data: {
+        totalWalkIns: totalWalkIns || 0,
+        totalCollectedDocs: totalCollectedDocs || 0,
+        totalLoggedIn: totalLoggedIn || 0,
+        totalPendingLogIn: totalPendingLogIn || 0
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 module.exports = {
   getAllDocSubmittedStudentsId,
   getAllDocSubmittedStudentsData,
-  getLoginPeddingStudents,
+  getLoginPendingStudents,
   getLoggedinStudents,
   getAllStudentsDetails,
-  getTodtalCountOfSubmittedDoc,
-  getAllWalkInsStudents
+  getTotalCountOfSubmittedDoc,
+  getAllWalkInsStudents,
+  getOverviewsCount
 };

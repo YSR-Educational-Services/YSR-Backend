@@ -9,6 +9,7 @@ let _ecet = require("./ecet");
 let _admin = require("./admin");
 let _emplyees = require("./employees");
 let _eapsetDocuments = require("./eapcetDocuments");
+let _management = require("./management");
 
 function initModels(sequelize) {
   let SequelizeMeta = _SequelizeMeta(sequelize, DataTypes);
@@ -20,6 +21,7 @@ function initModels(sequelize) {
   let admin = _admin(sequelize, DataTypes);
   let employees = _emplyees(sequelize, DataTypes);
   let eapcetDecuments = _eapsetDocuments(sequelize, DataTypes);
+  let management = _management(sequelize, DataTypes);
 
   return {
     SequelizeMeta,
@@ -29,7 +31,8 @@ function initModels(sequelize) {
     admin,
     refresh_tokens,
     employees,
-    eapcetDecuments
+    eapcetDecuments,
+    management
   };
 }
 

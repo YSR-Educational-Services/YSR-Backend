@@ -3,15 +3,17 @@ const {
   craeteEmcetStudent,
   getEmcetStudentById,
   getListOfEmcet,
-  getEmcetStudent
+  getEmcetStudent,
+  updateDocumentsTable
 } = require("../controllers/EmcetController");
 const {
   getAllDocSubmittedStudentsData,
   getAllStudentsDetails,
   getAllWalkInsStudents,
-  getLoginPeddingStudents,
+  getLoginPendingStudents,
   getLoggedinStudents,
-  getAllDocSubmittedStudentsId
+  getAllDocSubmittedStudentsId,
+  getOverviewsCount
 } = require("../controllers/OverviewsController");
 
 const {
@@ -35,10 +37,10 @@ const {
   getTotalCountOfSubmittedDoc,
   removeStudentsById,
   updateStudentDetails,
-  searchStudents,
-  updateEapcetDocumentsById
+  searchStudents
 } = require("../controllers/studentRegistrationsController");
 const { auth } = require("../middlewares/auth");
+const { createManagement } = require("../controllers/managementController");
 
 const router = express.Router();
 
@@ -64,15 +66,20 @@ router.get("/admin/documents-submitted-data", getAllDocSubmittedStudentsData);
 router.get("/admin/walk-ins-students", getAllWalkInsStudents);
 router.post("/user-login", adminLogin);
 router.get("/add-details-in-google-sheet", getAllStudentsDetails); // this just temp file
-router.get("/admin/login-pendding-students", getLoginPeddingStudents);
+router.get("/admin/login-pendding-students", getLoginPendingStudents);
 router.get("/admin/loggedin-students", getLoggedinStudents);
+router.get("/admin/dashboard/overview-count", getOverviewsCount);
 
 router.post("/emcet-student-registration", craeteEmcetStudent);
 router.get("/emcet-student-data/:id", getEmcetStudentById);
 router.get("/emcet-all-student-data", getListOfEmcet);
 router.get("/search-emcet-student", getEmcetStudent);
 router.get("/total-submitted-doc-ids", getAllDocSubmittedStudentsId);
-router.put("/admin/update-eapcet-doc/:id", updateEapcetDocumentsById);
+// router.put("/admin/update-eapcet-doc/:id", updateEapcetDocumentsById);
+
+router.post("/create-management-student", createManagement);
+
+router.put("/update-table", updateDocumentsTable);
 
 router.get("*", (req, res) => {
   res.send("<h1>Bad Credentail URL Not found  </h1>");
