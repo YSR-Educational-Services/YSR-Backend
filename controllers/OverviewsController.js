@@ -6,19 +6,27 @@ const {
 
 const getAllDocSubmittedStudentsId = async (req, res) => {
   try {
-    let docSubmittedStudentIds = await databases.eapcetDecuments.findAll({
+    let docTable = await databases.eapcetDecuments.findAll({
       attributes: ["_student"],
-      order: [["createdAt", "DESC"]],
+      order: [["_student", "DESC"]],
       raw: true
     });
-    // let docSubmittedStudentIds = await databases.students.findAll({
-    //   where: { isDocumentsSubmitted: true }
-    // });
-    if (docSubmittedStudentIds) {
-      let length = docSubmittedStudentIds.length;
+    let studentTable = await databases.students.findAll({
+      attributes: ["id"],
+      where: { isDocumentsSubmitted: true }
+    });
+    if (studentTable) {
+      let studentTableLength = studentTable.length;
+      let docTableLength = docTable.length;
+
       return res.status(200).json({
         success: false,
-        data: { docSubmittedStudentIds, length }
+        data: {
+          studentTable: studentTable,
+          docTable: docTable,
+          studentTableLength,
+          docTableLength
+        }
       });
     }
   } catch (error) {
@@ -50,6 +58,93 @@ const getTotalCountOfSubmittedDoc = async (req, res) => {
   }
 };
 
+// const getAllDocSubmittedStudentsData = async (req, res) => {
+//   try {
+//     console.log(123);
+//     let studentsData = await databases.students.findAll({
+//       attributes: [
+//         "id",
+//         "date",
+//         "nameOfApplicant",
+//         "fatherName",
+//         "category",
+//         "phoneNumber",
+//         "phoneNumber1",
+//         "withReferenceOf",
+//         "requestType"
+//       ],
+//       order: [["createdAt", "DESC"]],
+//       where: { isDocumentsSubmitted: true },
+//       raw: true
+//     });
+//     console.log(1);
+//     if (studentsData) {
+//       for (let i = 0; i < studentsData.length; i++) {
+//         let qualifyingDetails = await databases.eapcet.findOne({
+//           attributes: ["EAPCETRank", "EAPCETHallTicketNo"],
+//           where: { _student: studentsData[i].id },
+//           raw: true
+//         });
+//         if (!qualifyingDetails) {
+//           qualifyingDetails = {
+//             EAPCETRank: "N/A",
+//             EAPCETHallTicketNo: "N/A"
+//           };
+//         }
+//         if (!qualifyingDetails.EAPCETRank) {
+//           qualifyingDetails.EAPCETRank = "N/A";
+//         }
+//         if (!qualifyingDetails.EAPCETHallTicketNo) {
+//           qualifyingDetails.EAPCETHallTicketNo = "N/A";
+//         }
+//         let studentsOriginalDoc = await databases.eapcetDecuments.findOne({
+//           where: { _student: studentsData[i].id },
+//           raw: true
+//         });
+//         console.log(2);
+//         // console.log(studentsOriginalDoc);
+//         let filteredDoc = {};
+//         if (studentsOriginalDoc) {
+//           for (const key in studentsOriginalDoc) {
+//             if (studentsOriginalDoc[key] === "ORIGINAL") {
+//               let newKey = key;
+//               if (newKey === "HSCBonafideCertificate") {
+//                 newKey = "INTER-BONAFIDE";
+//               } else if (newKey === "castCertificate") {
+//                 newKey = "CASTECERTIFICATE";
+//               } else if (newKey === "SSCBonafideCertificate") {
+//                 newKey = "SSC-BONAFIDE";
+//               }
+//               filteredDoc[newKey.toUpperCase()] = studentsOriginalDoc[key];
+//             }
+//           }
+//         }
+//         console.log(3);
+//         studentsData[i].id = "YSR24" + studentsData[i].id;
+//         studentsData[i].studentsOriginalDoc = filteredDoc;
+//         studentsData[i].qualifyingDetails = qualifyingDetails;
+//         studentsData[i].docSubmittedDate = studentsOriginalDoc?.date;
+//       }
+//       console.log(5);
+//       return res.status(200).json({
+//         success: true,
+//         data: studentsData
+//       });
+//     }
+//     console.log(4);
+//     return res.status(404).json({
+//       success: false,
+//       message: `no record found`
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message
+//     });
+//   }
+// };
+
 const getAllDocSubmittedStudentsData = async (req, res) => {
   try {
     let studentsData = await databases.students.findAll({
@@ -70,35 +165,34 @@ const getAllDocSubmittedStudentsData = async (req, res) => {
     });
 
     if (studentsData) {
-      for (let i = 0; i < studentsData.length; i++) {
-        let qualifyingDetails = await databases.eapcet.findOne({
-          attributes: ["EAPCETRank", "EAPCETHallTicketNo"],
-          where: { _student: studentsData[i].id },
-          raw: true
-        });
-        if (!qualifyingDetails) {
-          qualifyingDetails = {
-            EAPCETRank: "N/A",
-            EAPCETHallTicketNo: "N/A"
-          };
+      const studentPromises = studentsData.map(async (student) => {
+        const [qualifyingDetails, studentsOriginalDoc] = await Promise.all([
+          databases.eapcet.findOne({
+            attributes: ["EAPCETRank", "EAPCETHallTicketNo"],
+            where: { _student: student.id },
+            raw: true
+          }),
+          databases.eapcetDecuments.findOne({
+            where: { _student: student.id },
+            raw: true
+          })
+        ]);
+
+        let finalQualifyingDetails = qualifyingDetails || {
+          EAPCETRank: "N/A",
+          EAPCETHallTicketNo: "N/A"
+        };
+
+        if (!finalQualifyingDetails.EAPCETRank) {
+          finalQualifyingDetails.EAPCETRank = "N/A";
         }
-        if (!qualifyingDetails.EAPCETRank) {
-          qualifyingDetails.EAPCETRank = "N/A";
+        if (!finalQualifyingDetails.EAPCETHallTicketNo) {
+          finalQualifyingDetails.EAPCETHallTicketNo = "N/A";
         }
-        if (!qualifyingDetails.EAPCETHallTicketNo) {
-          qualifyingDetails.EAPCETHallTicketNo = "N/A";
-        }
-        let studentsOriginalDoc = await databases.eapcetDecuments.findOne({
-          where: { _student: studentsData[i].id },
-          raw: true
-        });
-        // console.log(studentsOriginalDoc);
+
         let filteredDoc = {};
         if (studentsOriginalDoc) {
           for (const key in studentsOriginalDoc) {
-            if (studentsOriginalDoc._student == "501") {
-              console.log(studentsOriginalDoc);
-            }
             if (studentsOriginalDoc[key] === "ORIGINAL") {
               let newKey = key;
               if (newKey === "HSCBonafideCertificate") {
@@ -112,19 +206,26 @@ const getAllDocSubmittedStudentsData = async (req, res) => {
             }
           }
         }
-        studentsData[i].id = "YSR24" + studentsData[i].id;
-        studentsData[i].studentsOriginalDoc = filteredDoc;
-        studentsData[i].qualifyingDetails = qualifyingDetails;
-        studentsData[i].docSubmittedDate = studentsOriginalDoc?.date;
-      }
+
+        student.id = "YSR24" + student.id;
+        student.studentsOriginalDoc = filteredDoc;
+        student.qualifyingDetails = finalQualifyingDetails;
+        student.docSubmittedDate = studentsOriginalDoc?.date;
+
+        return student;
+      });
+
+      studentsData = await Promise.all(studentPromises);
+
       return res.status(200).json({
         success: true,
         data: studentsData
       });
     }
+
     return res.status(404).json({
       success: false,
-      message: `no record found`
+      message: "no record found"
     });
   } catch (error) {
     console.log(error);

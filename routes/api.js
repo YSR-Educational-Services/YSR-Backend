@@ -5,7 +5,7 @@ const {
   getListOfEmcet,
   getEmcetStudent,
   updateDocumentsTable
-} = require("../controllers/EmcetController");
+} = require("../controllers/EapcetController");
 const {
   getAllDocSubmittedStudentsData,
   getAllStudentsDetails,

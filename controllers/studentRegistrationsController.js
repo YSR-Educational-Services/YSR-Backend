@@ -97,55 +97,6 @@ const createStudentRegistration = async (req, res) => {
   }
 };
 
-// const getStudentDetailsById = async (req, res) => {
-//   try {
-//     let { id } = req.params;
-//     let studentData = await databases.students.findOne({
-//       attributes: { exclude: ["createdAt", "updatedAt"] },
-//       where: { id }
-//     });
-//     if (!studentData) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Student not found"
-//       });
-//     }
-//     return res.status(200).json({
-//       success: true,
-//       data: studentData
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-//   }
-// };
-
-// const getAllStudentsDetails = async (req, res) => {
-//   try {
-//     let studentsData = await databases.students.findAll({
-//       attributes: { exclude: ["createdAt", "updatedAt"] }
-//     });
-//     if (!studentsData) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "No Record Found"
-//       });
-//     }
-//     return res.status(200).json({
-//       success: true,
-//       data: studentsData
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-//   }
-// };
 
 const createStudent = async (req, res) => {
   try {
@@ -156,6 +107,9 @@ const createStudent = async (req, res) => {
     });
     if (!(inputData.requestType.toUpperCase() === "EAPCET")) {
       inputData.requestType.toUpperCase() = "EAPCET"
+    }
+    if (!(inputData.courseLevel.toUpperCase() === "B.TECH")) {
+      inputData.courseLevel.toUpperCase() = "B.TECH"
     }
     let isStudentExist;
     if (inputData.requestType.toUpperCase() === "EAPCET") {
@@ -189,6 +143,7 @@ const createStudent = async (req, res) => {
       category: inputData.category,
       date: inputData.date,
       requestType: inputData.requestType?.toUpperCase(),
+      courseLevel: inputData.courseLevel,
       courseName: inputData.courseName.map((course) => course).join(", "),
       nameofInstution: inputData.nameofInstution,
       withReferenceOf: inputData.withReferenceOf,
@@ -451,12 +406,12 @@ const createEapcetDocuments = async (req, res) => {
         { where: { _student: inputData.studentId } }
       );
       if (updated) {
+        // await databases.students.update({isDocumentsSubmitted: true}, {where: {id:inputData.studentId}})
         documents = await databases.eapcetDecuments.findOne({
           where: { _student: inputData.studentId }
         });
       }
     } else {
-      console.log(inputData.date);
       documents = await databases.eapcetDecuments.create({
         date: inputData.date,
         sscLongMemo: inputData.sscLongMemo,
@@ -476,6 +431,7 @@ const createEapcetDocuments = async (req, res) => {
       });
     }
     if (documents) {
+      await databases.students.update({isDocumentsSubmitted: true}, {where: {id:inputData.studentId}})
       return res.status(200).json({
         success: true,
         message: "Added Successfully.....",
@@ -576,38 +532,12 @@ const getTotalCountOfSubmittedDoc = async (req, res) => {
   }
 };
 
-const getTotalCountOfWalkIn = async (req, res) => {
-  try {
-    let totalEapcetWalkIn = await databases.students.count();
-    if (totalEapcetSubmittedDoc) {
-      return res.status(200).json({
-        success: true,
-        data: totalEapcetSubmittedDoc
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
 
 const getStudentDetailsById = async (req, res) => {
   try {
     let _student = req.params.studentId;
     _student = _student.substring(5);
     let student = await databases.students.findOne({
-      // attributes: [
-      //   "id",
-      //   "createdAt",
-      //   "nameOfApplicant",
-      //   "fatherName",
-      //   "category",
-      //   "phoneNumber",
-      //   "withReferenceOf"
-      // ],
       where: { id: _student },
       raw: true
     });
@@ -662,7 +592,6 @@ const removeStudentsById = async (req, res) => {
           where: { id: _student }
         });
       }
-      console.log(11111);
       return res.status(200).json({
         success: true,
         message: "Data Deleted Successfully"
@@ -901,7 +830,6 @@ const updateStudentDetails = async (req, res) => {
 const searchStudents = async (req, res) => {
   try {
     const { searchData } = req.params;
-
     if (searchData) {
       let students = await databases.students.findAll({
         where: {

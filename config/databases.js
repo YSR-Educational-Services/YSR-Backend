@@ -14,8 +14,8 @@ const sequelize = new Sequelize(database, username, password, {
   pool: {
     max: 1,
     min: 0,
-    acquire: 10000000,
-    idle: 10000000
+    acquire: 100000,
+    idle: 100000
   }
 });
 const databases = initModels(sequelize);
