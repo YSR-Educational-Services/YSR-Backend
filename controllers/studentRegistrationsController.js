@@ -5,6 +5,7 @@ const {
   appendToSheet
 } = require("../helpers/googleSheet");
 const { where, Op } = require("sequelize");
+const { default: AsyncQueue } = require("sequelize/lib/dialects/mssql/async-queue");
 
 const createStudentRegistration = async (req, res) => {
   try {
@@ -449,6 +450,7 @@ const createEapcetDocuments = async (req, res) => {
         }
       }
      let student = await databases.students.findOne({where:{id: inputData.studentId},raw:true})
+     let qualifying = await databases.eapcet.findOne({where: {_student: inputData.studentId}, raw:true})
       student.id = "YSR24" + student.id;
       student.studentsOriginalDoc = filteredDoc;
       student.docsDate = studentsOriginalDoc.date;
@@ -462,8 +464,8 @@ const createEapcetDocuments = async (req, res) => {
         student.phoneNumber || " ",
         student.phoneNumber1 || " ",
         student.category || " ",
-        student.HallTicketNumber || " ",
-        student.EapcetRank || " ",
+        qualifying.EAPCETHallTicketNo || " ",
+        qualifying.EAPCETRank || " ",
         student.withReferenceOf || " ",
         student.docsDate || " ",
         JSON.stringify(student.studentsOriginalDoc || " ") 
