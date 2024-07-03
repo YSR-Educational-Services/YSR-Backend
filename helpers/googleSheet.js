@@ -2,7 +2,7 @@ require("dotenv").config();
 const { google } = require("googleapis");
 
 const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS);
-var spreadsheetId = "1wchsToFbIfnar4M99bYS41ITJwNbVeIn5_Bfkkmxy-M";
+
 const auth = new google.auth.GoogleAuth({
   credentials,
   scopes: ["https://www.googleapis.com/auth/spreadsheets"]
@@ -10,7 +10,7 @@ const auth = new google.auth.GoogleAuth({
 
 const range = "Sheet1!A1";
 
-async function appendToSheet(values) {
+async function appendToSheet(values, spreadsheetId) {
   const sheets = google.sheets({ version: "v4", auth });
   const valueInputOption = "USER_ENTERED";
 
@@ -30,7 +30,7 @@ async function appendToSheet(values) {
   }
 }
 
-async function checkAndWriteHeaders(headerValues) {
+async function checkAndWriteHeaders(headerValues, spreadsheetId) {
   const sheets = google.sheets({ version: "v4", auth });
 
   try {
@@ -60,6 +60,5 @@ async function checkAndWriteHeaders(headerValues) {
     return error;
   }
 }
-
 
 module.exports = { checkAndWriteHeaders, appendToSheet };

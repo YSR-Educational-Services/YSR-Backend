@@ -284,8 +284,8 @@ const createStudent = async (req, res) => {
     }
     data.qualifyingDetails = qualifyingDetails;
     data.id = "YSR24" + data.id;
-    //await checkAndWriteHeaders(headerValues, spreadsheetId);
-    //await appendToSheet(values, spreadsheetId);
+    await checkAndWriteHeaders(headerValues, spreadsheetId);
+    await appendToSheet(values, spreadsheetId);
 
     if (data) {
       return res.status(200).json({
@@ -372,7 +372,6 @@ const getAllStudentsData = async (req, res) => {
 const createEapcetDocuments = async (req, res) => {
   try {
     let inputData = req.body;
-    console.log(inputData);
     inputData.studentId = inputData.studentId.substring(5);
     const { id, ...dataWithoutId } = inputData;
     if (!dataWithoutId) {
@@ -431,6 +430,62 @@ const createEapcetDocuments = async (req, res) => {
       });
     }
     if (documents) {
+      let studentsOriginalDoc = await databases.eapcetDecuments.findOne({where: {_student: inputData.studentId}, raw:true});
+      
+      let filteredDoc = {};
+      if (studentsOriginalDoc) {
+        for (const key in studentsOriginalDoc) {
+          if (studentsOriginalDoc[key] === "ORIGINAL") {
+            let newKey = key;
+            if (newKey === "HSCBonafideCertificate") {
+              newKey = "INTER-BONAFIDE";
+            } else if (newKey === "castCertificate") {
+              newKey = "CASTECERTIFICATE";
+            } else if (newKey === "SSCBonafideCertificate") {
+              newKey = "SSC-BONAFIDE";
+            }
+            filteredDoc[newKey.toUpperCase()] = studentsOriginalDoc[key];
+          }
+        }
+      }
+     let student = await databases.students.findOne({where:{id: inputData.studentId},raw:true})
+      student.id = "YSR24" + student.id;
+      student.studentsOriginalDoc = filteredDoc;
+      student.docsDate = studentsOriginalDoc.date;
+      var spreadsheetId = "1wchsToFbIfnar4M99bYS41ITJwNbVeIn5_Bfkkmxy-M";
+      const values = [[
+        student.id || " ",
+        student.date || " ",
+        student.nameOfApplicant || " ",
+        student.fatherName || " ",
+        student.dateOfBirth || " ",
+        student.phoneNumber || " ",
+        student.phoneNumber1 || " ",
+        student.category || " ",
+        student.HallTicketNumber || " ",
+        student.EapcetRank || " ",
+        student.withReferenceOf || " ",
+        student.docsDate || " ",
+        JSON.stringify(student.studentsOriginalDoc || " ") 
+      ]];
+      const headerValues = [
+        "Student Id",
+        "Date Of Walk-In",
+        "Name Of Applicant",
+        "Father Name",
+        "Date Of Birth",
+        "Phone Number",
+        "Alternate Number",
+        "Category",
+        "Hall Ticket Number",
+        "Eapcet Rank",
+        "With Reference of",
+        "Date Of Docs Collected",
+        "Submitted Documents"
+      ];
+      await checkAndWriteHeaders(headerValues, spreadsheetId);
+      await appendToSheet(values, spreadsheetId);
+      
       await databases.students.update({isDocumentsSubmitted: true}, {where: {id:inputData.studentId}})
       return res.status(200).json({
         success: true,
@@ -450,6 +505,37 @@ const createEapcetDocuments = async (req, res) => {
     });
   }
 };
+
+const removeEapcetDocuments = async (req, res)=>{
+  try {
+    let {studentId} = req.params
+    studentId = studentId.substring(5)
+
+    let isStudentAvailable = await databases.eapcetDecuments.findOne({
+      where:{_student:studentId}
+    })
+    if (!isStudentAvailable) {
+      return res.status(404).json({
+        success: false,
+        message: `No Documents Submitted till now With this student YSR24${studentId}`
+      })
+    }
+    const isDeleted = await databases.eapcetDecuments.destroy({ where:{_student:studentId}})
+    if (isDeleted) {
+      await databases.students.update({isDocumentsSubmitted:false},{where:{id:studentId}})
+      return res.status(200).json({
+        success: true,
+        message: `Documents Details Deleted successfully..`
+      })
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
 
 // const updateEapcetDocumentsById = async (req, res)=>{
 //   try {
@@ -866,6 +952,38 @@ const searchStudents = async (req, res) => {
   }
 };
 
+const craeteLoginDetails = async(req, res)=>{
+  try {
+    let _student = req.params.studentId;
+    _student =_student.substring(5);
+    const inputData = req.body;
+console.log(inputData);
+    let isStudentAvailable = await databases.students.findOne({where:{id:_student}})
+    if (!isStudentAvailable) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found..."
+      })
+    }
+    const loginData = await databases.loginDetails.create({sloteDate:inputData.sloteDate,loginId:inputData.loginId,email:inputData.email,_student:_student})
+    if (loginData) {
+      return res.status(200).json({
+        success: true,
+        message: "Login Data Submitted Successfully...."
+      })
+    }
+    return res.status(200).json({
+      success: false,
+      message: "Login Data Submission failed...."
+    })
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
 module.exports = {
   createStudentRegistration,
   createStudent,
@@ -877,5 +995,7 @@ module.exports = {
   removeStudentsById,
   updateStudentDetails,
   searchStudents,
+  craeteLoginDetails,
+  removeEapcetDocuments
   // updateEapcetDocumentsById, // just for short term use 
 };

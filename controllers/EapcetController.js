@@ -1,5 +1,11 @@
 const moment = require("moment");
 const databases = require("../config/databases");
+const { where } = require("sequelize");
+const { raw } = require("body-parser");
+const {
+  checkAndWriteHeaders,
+  appendToSheet
+} = require("../helpers/googleSheet");
 
 const craeteEmcetStudent = async (req, res) => {
   try {
@@ -558,10 +564,102 @@ const updateDocumentsTable = async (req, res) => {
   }
 };
 
+const addWalkInsStudentsSheet = async (req, res) => {
+  try {
+    let students = await databases.students.findAll({ raw: true });
+    for (let i = 0; i < students.length; i++) {
+      students[i].qualifyingDetails = await databases.eapcet.findOne({
+        where: { _student: students[i].id },
+        raw: true
+      });
+      students[
+        i
+      ].downloadLink = `https://ysredu.in/admin/get-student-details-by-id/YSR24${students[i].id}`;
+      students[i].id = "YSR24" + students[i].id;
+      students[i].courseLevel = "B.TECH";
+    }
+    var headerValues;
+
+    let spreadsheetId = "1edepkSuyeylc8IEFf_ym22y56VDfHvkWrlYuUxeFUx8";
+    const values = students.map((student) => [
+      student.id || " ",
+      student.date || " ",
+      student.nameOfApplicant || " ",
+      student.fatherName || " ",
+      student.dateOfBirth || " ",
+      student.addressOfCommunication || " ",
+      student.phoneNumber || " ",
+      student.phoneNumber1 || " ",
+      student.aadharNo || " ",
+      student.category || " ",
+      student.qualifyingDetails?.sscSchoolName || " ",
+      student.qualifyingDetails?.sscPassingYear || " ",
+      student.qualifyingDetails?.sscPercentage || " ",
+      student.qualifyingDetails?.hscSchoolName || " ",
+      student.qualifyingDetails?.hscPassingYear || " ",
+      student.qualifyingDetails?.hscPercentage || " ",
+      student.qualifyingDetails?.EAPCETHallTicketNo || " ",
+      student.qualifyingDetails?.EAPCETRank || " ",
+      student.nameofInstution || " ",
+      student.courseName || " ",
+      student.withReferenceOf || " ",
+      student.reference || " ",
+      student.downloadLink
+    ]);
+
+    headerValues = [
+      "YSR ID",
+      "Date",
+      "Name Of Applicant",
+      "Father Name",
+      "Date Of Birth",
+      "Address Of Communication",
+      "Phone Number",
+      "Alternate Phone Number",
+      "Aadhar No",
+      "Category",
+      "SSC School Name",
+      "SSC Passing Year",
+      "SSC Percentage",
+      "HSC School Name",
+      "HSC Passing Year",
+      "HSC Percentage",
+      "EAPCET Hall Ticket No",
+      "EAPCET Rank",
+      "Name Of Institution",
+      "Course Name",
+      "With Reference Of",
+      "Reference",
+      "Download_Link"
+    ];
+    await checkAndWriteHeaders(headerValues, spreadsheetId);
+    await appendToSheet(values, spreadsheetId);
+
+    if (students) {
+      return res.status(200).json({
+        success: true,
+        message: "Registration Done",
+        students
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: "Registration Unsuccessful"
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   craeteEmcetStudent,
   getEmcetStudentById,
   getListOfEmcet,
   getEmcetStudent,
-  updateDocumentsTable
+  updateDocumentsTable,
+  addWalkInsStudentsSheet
 };

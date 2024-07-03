@@ -285,7 +285,7 @@ const getAllStudentsDetails = async (req, res) => {
         studentsData[i].HallTicketNumber = qualifyingDetails.EAPCETHallTicketNo;
         studentsData[i].EapcetRank = qualifyingDetails.EAPCETRank;
       }
-
+      var spreadsheetId = "1wchsToFbIfnar4M99bYS41ITJwNbVeIn5_Bfkkmxy-M";
       const values = studentsData.map((student) => [
         student.id,
         student.date,
@@ -319,8 +319,8 @@ const getAllStudentsDetails = async (req, res) => {
       ];
 
       // Write to Google Sheet
-      await checkAndWriteHeaders(headerValues);
-      await appendToSheet(values);
+      await checkAndWriteHeaders(headerValues, spreadsheetId);
+      await appendToSheet(values, spreadsheetId);
       return res.status(200).json({
         success: true,
         message: "Data Added in Google sheets"
