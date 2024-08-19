@@ -83,4 +83,38 @@ const adminLogin = async (req, res) => {
   }
 };
 
-module.exports = { createAdmin, adminLogin };
+const changePassword = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!validatePassword(password)) {
+      return res.status(401).json({
+        success: false,
+        message: `Password must contain at least one capital letter, one small letter, one special character, one number, and be at least 8 characters long.`
+      });
+    }
+    let hashPassword = bcrypt.hashSync(password, 10);
+    let result = await databases.admin.update(
+      { password: hashPassword },
+      { where: { email: email } }
+    );
+
+    if (result.length >= 1) {
+      return res.status(200).json({
+        success: true,
+        message: "Password Change Successfully"
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: "Failed to change password"
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(501).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+module.exports = { createAdmin, adminLogin, changePassword };

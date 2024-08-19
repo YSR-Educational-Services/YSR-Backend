@@ -8,9 +8,13 @@ let _eapcet = require("./eapcet");
 let _ecet = require("./ecet");
 let _admin = require("./admin");
 let _emplyees = require("./employees");
-let _eapsetDocuments = require("./eapcetDocuments");
+let _eapcetDocuments = require("./eapcetDocuments");
 let _management = require("./management");
 let _loginDetails = require("./loginDetails");
+let _notifications = require("./notifications");
+let _icet = require("./icet");
+let _icetClg = require("./icetColleges");
+let _icetDocuments = require("./icetDocuments");
 
 function initModels(sequelize) {
   let SequelizeMeta = _SequelizeMeta(sequelize, DataTypes);
@@ -21,9 +25,13 @@ function initModels(sequelize) {
   let ecet = _ecet(sequelize, DataTypes);
   let admin = _admin(sequelize, DataTypes);
   let employees = _emplyees(sequelize, DataTypes);
-  let eapcetDecuments = _eapsetDocuments(sequelize, DataTypes);
+  let eapcetDecuments = _eapcetDocuments(sequelize, DataTypes);
   let management = _management(sequelize, DataTypes);
   let loginDetails = _loginDetails(sequelize, DataTypes);
+  let notifications = _notifications(sequelize, DataTypes);
+  let icet = _icet(sequelize, DataTypes);
+  let icetClg = _icetClg(sequelize, DataTypes);
+  let icetDocuments = _icetDocuments(sequelize, DataTypes);
 
   return {
     SequelizeMeta,
@@ -35,7 +43,11 @@ function initModels(sequelize) {
     employees,
     eapcetDecuments,
     management,
-    loginDetails
+    loginDetails,
+    notifications,
+    icet,
+    icetClg,
+    icetDocuments
   };
 }
 

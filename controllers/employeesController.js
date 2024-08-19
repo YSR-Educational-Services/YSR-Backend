@@ -1,4 +1,6 @@
+const { raw } = require("body-parser");
 const databases = require("../config/databases");
+const { Op, where } = require("sequelize");
 
 const addEmployees = async (req, res) => {
   try {
@@ -137,9 +139,147 @@ const getAllEmployees = async (req, res) => {
   }
 };
 
+const topPerformance = async (req, res) => {
+  try {
+    let allEmployees = await databases.employees.findAll({
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      raw: true
+    });
+
+    if (allEmployees.length > 0) {
+      for (let i = 0; i < allEmployees.length; i++) {
+        let topPerformanceCount = await databases.students.count({
+          where: {
+            withReferenceOf: {
+              [Op.like]: `%(${allEmployees[i].phoneNumber})%`
+            }
+          }
+        });
+        let avg = (topPerformanceCount / 30) * 100;
+        allEmployees[i].count = avg.toFixed(2);
+      }
+
+      allEmployees.sort((a, b) => b.count - a.count);
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: allEmployees
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(501).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const performanceGraph = async (req, res) => {
+  try {
+    const currentDate = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(currentDate.getDate() - 7);
+    let allEmployees = await databases.employees.findAll({
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      raw: true
+    });
+    let topPerformanceCounts = [];
+    if (allEmployees.length > 0) {
+      for (let i = 0; i < allEmployees.length; i++) {
+        const topPerformance = await databases.students.count({
+          where: {
+            withReferenceOf: {
+              [Op.like]: `%(${allEmployees[i].phoneNumber})%`
+            },
+            createdAt: {
+              [Op.between]: [sevenDaysAgo, currentDate]
+            }
+          }
+        });
+
+        allEmployees[i].count = topPerformance;
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: allEmployees
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(501).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const totalPerformanceDaywise = async (req, res) => {
+  try {
+    let { startDate, endDate } = req.query;
+
+    // Set default dates if not provided
+    if (startDate) {
+      startDate = new Date(startDate);
+    } else {
+      startDate = new Date();
+    }
+
+    if (endDate) {
+      endDate = new Date(endDate);
+    } else {
+      endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() - 6);
+    }
+
+    // Ensure startDate is after endDate
+    if (startDate < endDate) {
+      [startDate, endDate] = [endDate, startDate];
+    }
+
+    let reality = [];
+    let date = new Date(endDate);
+    let sumOfReality = 0;
+    while (date <= startDate) {
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const totalReality = await databases.students.count({
+        where: {
+          createdAt: {
+            [Op.between]: [startOfDay, endOfDay]
+          }
+        }
+      });
+      sumOfReality += totalReality;
+      reality.push({
+        date: date.toISOString().split("T")[0],
+        count: totalReality
+      });
+      date.setDate(date.getDate() + 1);
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: reality
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(501).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   addEmployees,
   getAllEmployees,
   removeEmployees,
-  updateEmployeeDetails
+  updateEmployeeDetails,
+  topPerformance,
+  totalPerformanceDaywise
 };

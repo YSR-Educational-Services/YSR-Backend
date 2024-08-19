@@ -1,19 +1,19 @@
-{
+ {
   "development": {
-    "username": "u427704821_adminLive",
-    "password": "1cN=j5g04iW",
-    "database": "u427704821_YSRLive",
-    "host": "srv1398.hstgr.io",
+    "username": "root",
+    "password": "password",
+    "database": "ysr-students-records",
+    "host": "localhost",
     "dialect": "mysql",
     "port": "3306",
     "charset": "utf8mb4",
     "collate": "utf8mb4_unicode_ci"
   },
   "production": {
-    "username": "u427704821_adminLive",
-    "password": "1cN=j5g04iW",
-    "database": "u427704821_YSRLive",
-    "host": "srv1398.hstgr.io",
+    "username": "root",
+    "password": "password",
+    "database": "ysr-students-records",
+    "host": "localhost",
     "dialect": "mysql",
     "port": "3306",
     "charset": "utf8mb4",

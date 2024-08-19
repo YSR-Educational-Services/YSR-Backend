@@ -2,28 +2,29 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("loginDetails", {
+    await queryInterface.createTable("notifications", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      slotDate: {
-        type: Sequelize.DATEONLY,
+      time: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: Sequelize.NOW
+      },
+      title: {
+        type: Sequelize.STRING(255),
         allowNull: false
       },
-      loginId: {
-        type: Sequelize.STRING,
+      body: {
+        type: Sequelize.STRING(255),
         allowNull: false
       },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      ROC: {
-        type: Sequelize.STRING,
-        allowNull: false
+      isRead: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       _student: {
         allowNull: false,
@@ -44,6 +45,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("loginDetails");
+    await queryInterface.dropTable("notifications");
   }
 };

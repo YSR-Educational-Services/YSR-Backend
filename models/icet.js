@@ -1,6 +1,6 @@
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define(
-    "loginDetails",
+    "icet",
     {
       id: {
         allowNull: false,
@@ -8,20 +8,32 @@ module.exports = function (sequelize, DataTypes) {
         primaryKey: true,
         type: DataTypes.INTEGER
       },
-      slotDate: {
-        type: DataTypes.DATEONLY,
-        allowNull: false
-      },
-      loginId: {
+      degreeClgName: {
         type: DataTypes.STRING,
         allowNull: false
       },
-      password: {
+      university: {
         type: DataTypes.STRING,
         allowNull: false
       },
-      ROC: {
+      degreePassingYear: {
         type: DataTypes.STRING,
+        allowNull: false
+      },
+      degreeObtainedMarks: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      degreePercentage: {
+        type: DataTypes.FLOAT,
+        allowNull: false
+      },
+      ICETHallTicketNo: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      ICETRank: {
+        type: DataTypes.INTEGER,
         allowNull: false
       },
       _student: {
@@ -35,7 +47,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     {
       sequelize,
-      tableName: "loginDetails",
+      tableName: "icet",
       timestamps: true,
       indexes: [
         {

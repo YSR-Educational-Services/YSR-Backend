@@ -2,36 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("loginDetails", {
+    await queryInterface.createTable("icetColleges", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      slotDate: {
-        type: Sequelize.DATEONLY,
-        allowNull: false
-      },
-      loginId: {
+      clgCode: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      password: {
+      clgName: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      ROC: {
+      university: {
         type: Sequelize.STRING,
         allowNull: false
-      },
-      _student: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-        references: {
-          model: "students",
-          key: "id"
-        }
       },
       createdAt: {
         allowNull: false,
@@ -44,6 +32,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("loginDetails");
+    await queryInterface.dropTable("icetColleges");
   }
 };

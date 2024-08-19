@@ -1,9 +1,11 @@
+const { where } = require("sequelize");
 const databases = require("../config/databases");
 const {
   checkAndWriteHeaders,
   appendToSheet
 } = require("../helpers/googleSheet");
 
+//this is just for temp use
 const getAllDocSubmittedStudentsId = async (req, res) => {
   try {
     let docTable = await databases.eapcetDecuments.findAll({
@@ -58,95 +60,20 @@ const getTotalCountOfSubmittedDoc = async (req, res) => {
   }
 };
 
-// const getAllDocSubmittedStudentsData = async (req, res) => {
-//   try {
-//     console.log(123);
-//     let studentsData = await databases.students.findAll({
-//       attributes: [
-//         "id",
-//         "date",
-//         "nameOfApplicant",
-//         "fatherName",
-//         "category",
-//         "phoneNumber",
-//         "phoneNumber1",
-//         "withReferenceOf",
-//         "requestType"
-//       ],
-//       order: [["createdAt", "DESC"]],
-//       where: { isDocumentsSubmitted: true },
-//       raw: true
-//     });
-//     console.log(1);
-//     if (studentsData) {
-//       for (let i = 0; i < studentsData.length; i++) {
-//         let qualifyingDetails = await databases.eapcet.findOne({
-//           attributes: ["EAPCETRank", "EAPCETHallTicketNo"],
-//           where: { _student: studentsData[i].id },
-//           raw: true
-//         });
-//         if (!qualifyingDetails) {
-//           qualifyingDetails = {
-//             EAPCETRank: "N/A",
-//             EAPCETHallTicketNo: "N/A"
-//           };
-//         }
-//         if (!qualifyingDetails.EAPCETRank) {
-//           qualifyingDetails.EAPCETRank = "N/A";
-//         }
-//         if (!qualifyingDetails.EAPCETHallTicketNo) {
-//           qualifyingDetails.EAPCETHallTicketNo = "N/A";
-//         }
-//         let studentsOriginalDoc = await databases.eapcetDecuments.findOne({
-//           where: { _student: studentsData[i].id },
-//           raw: true
-//         });
-//         console.log(2);
-//         // console.log(studentsOriginalDoc);
-//         let filteredDoc = {};
-//         if (studentsOriginalDoc) {
-//           for (const key in studentsOriginalDoc) {
-//             if (studentsOriginalDoc[key] === "ORIGINAL") {
-//               let newKey = key;
-//               if (newKey === "HSCBonafideCertificate") {
-//                 newKey = "INTER-BONAFIDE";
-//               } else if (newKey === "castCertificate") {
-//                 newKey = "CASTECERTIFICATE";
-//               } else if (newKey === "SSCBonafideCertificate") {
-//                 newKey = "SSC-BONAFIDE";
-//               }
-//               filteredDoc[newKey.toUpperCase()] = studentsOriginalDoc[key];
-//             }
-//           }
-//         }
-//         console.log(3);
-//         studentsData[i].id = "YSR24" + studentsData[i].id;
-//         studentsData[i].studentsOriginalDoc = filteredDoc;
-//         studentsData[i].qualifyingDetails = qualifyingDetails;
-//         studentsData[i].docSubmittedDate = studentsOriginalDoc?.date;
-//       }
-//       console.log(5);
-//       return res.status(200).json({
-//         success: true,
-//         data: studentsData
-//       });
-//     }
-//     console.log(4);
-//     return res.status(404).json({
-//       success: false,
-//       message: `no record found`
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-//   }
-// };
-
 const getAllDocSubmittedStudentsData = async (req, res) => {
   try {
+    let { page, limit } = req.query;
+    page = parseInt(page, 10) || 1;
+    limit = parseInt(limit, 10) || 10;
+    // page = page ? parseInt(page) : 1;
+    // limit = 10;
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page and limit must be positive integers"
+      });
+    }
+    const offset = (page - 1) * limit;
     let studentsData = await databases.students.findAll({
       attributes: [
         "id",
@@ -161,9 +88,13 @@ const getAllDocSubmittedStudentsData = async (req, res) => {
       ],
       order: [["createdAt", "DESC"]],
       where: { isDocumentsSubmitted: true },
+      limit: limit,
+      offset: offset,
       raw: true
     });
-
+    let totalStudents = await databases.students.count({
+      where: { isDocumentsSubmitted: true }
+    });
     if (studentsData) {
       const studentPromises = studentsData.map(async (student) => {
         const [qualifyingDetails, studentsOriginalDoc] = await Promise.all([
@@ -219,7 +150,7 @@ const getAllDocSubmittedStudentsData = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        data: studentsData
+        data: { studentsData, totalStudents }
       });
     }
 
@@ -299,7 +230,7 @@ const getAllStudentsDetails = async (req, res) => {
         student.EapcetRank,
         student.withReferenceOf,
         student.docsDate,
-        JSON.stringify(student.studentsOriginalDoc) // Convert object to string if needed
+        JSON.stringify(student.studentsOriginalDoc)
       ]);
 
       const headerValues = [
@@ -320,6 +251,7 @@ const getAllStudentsDetails = async (req, res) => {
 
       // Write to Google Sheet
       await checkAndWriteHeaders(headerValues, spreadsheetId);
+
       await appendToSheet(values, spreadsheetId);
       return res.status(200).json({
         success: true,
@@ -341,7 +273,19 @@ const getAllStudentsDetails = async (req, res) => {
 
 const getAllWalkInsStudents = async (req, res) => {
   try {
-    let studentsData = await databases.students.findAll({
+    let { page, limit } = req.query;
+    page = parseInt(page, 10) || 1;
+    limit = parseInt(limit, 10) || 10;
+
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Page and limit must be positive integers"
+      });
+    }
+
+    const offset = (page - 1) * limit;
+    const studentsData = await databases.students.findAll({
       attributes: [
         "id",
         "date",
@@ -354,50 +298,63 @@ const getAllWalkInsStudents = async (req, res) => {
         "requestType"
       ],
       order: [["createdAt", "DESC"]],
+      where: { requestType: "EAPCET" },
+      limit: limit,
+      offset: offset,
       raw: true
     });
-    if (studentsData) {
-      for (let i = 0; i < studentsData.length; i++) {
+
+    // Get the total count of records
+    const count = await databases.students.count({
+      where: { requestType: "EAPCET" }
+    });
+
+    // Enrich student data with qualifying details
+    const enrichedStudentsData = await Promise.all(
+      studentsData.map(async (student) => {
         let qualifyingDetails = await databases.eapcet.findOne({
           attributes: ["EAPCETRank", "EAPCETHallTicketNo"],
-          where: { _student: studentsData[i].id },
+          where: { _student: student.id },
           raw: true
         });
+
         if (!qualifyingDetails) {
           qualifyingDetails = {
             EAPCETRank: "N/A",
             EAPCETHallTicketNo: "N/A"
           };
         }
-        if (!qualifyingDetails.EAPCETRank) {
-          qualifyingDetails.EAPCETRank = "N/A";
-        }
-        if (!qualifyingDetails.EAPCETHallTicketNo) {
-          qualifyingDetails.EAPCETHallTicketNo = "N/A";
-        }
-        studentsData[i].id = "YSR24" + studentsData[i].id;
-        studentsData[i].qualifyingDetails = qualifyingDetails;
+
+        return {
+          ...student,
+          id: "YSR24" + student.id,
+          qualifyingDetails
+        };
+      })
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        studentsData: enrichedStudentsData,
+        totalRecords: count
       }
-      return res.status(200).json({
-        success: true,
-        data: studentsData
-      });
-    }
-    return res.status(404).json({
-      success: false,
-      message: `no record found`
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching students:", error);
     return res.status(500).json({
       success: false,
-      message: error.message
+      message: "Internal server error"
     });
   }
 };
 
 const getLoginPendingStudents = async (req, res) => {
   try {
+    let { page, limit } = req.query;
+    page = page ? parseInt(page) : 1;
+    limit = limit ? parseInt(limit) : 10;
+    const offset = (page - 1) * limit;
     let studentsData = await databases.students.findAll({
       attributes: [
         "id",
@@ -412,7 +369,12 @@ const getLoginPendingStudents = async (req, res) => {
       ],
       order: [["createdAt", "DESC"]],
       where: { isLoggedin: false },
+      limit: limit,
+      offset: offset,
       raw: true
+    });
+    const totalStudents = await databases.students.count({
+      where: { isLoggedin: false }
     });
     if (studentsData) {
       for (let i = 0; i < studentsData.length; i++) {
@@ -438,7 +400,7 @@ const getLoginPendingStudents = async (req, res) => {
       }
       return res.status(200).json({
         success: true,
-        data: studentsData
+        data: { studentsData, totalStudents }
       });
     }
     return res.status(404).json({
@@ -456,6 +418,10 @@ const getLoginPendingStudents = async (req, res) => {
 
 const getLoggedinStudents = async (req, res) => {
   try {
+    let { page } = req.params;
+    page = page ? parseInt(page) : 1;
+    let limit = 10;
+    const offset = (page - 1) * limit;
     let studentsData = await databases.students.findAll({
       attributes: [
         "id",
@@ -463,6 +429,7 @@ const getLoggedinStudents = async (req, res) => {
         "nameOfApplicant",
         "fatherName",
         "category",
+        "dateOfBirth",
         "phoneNumber",
         "phoneNumber1",
         "withReferenceOf",
@@ -470,10 +437,18 @@ const getLoggedinStudents = async (req, res) => {
       ],
       order: [["createdAt", "DESC"]],
       where: { isLoggedin: true },
+      limit: limit,
+      offset: offset,
       raw: true
+    });
+    let totalStudents = await databases.students.count({
+      where: { isLoggedin: true }
     });
     if (studentsData) {
       for (let i = 0; i < studentsData.length; i++) {
+        let loginDetails = await databases.loginDetails.findOne({
+          where: { _student: studentsData[i].id }
+        });
         let qualifyingDetails = await databases.eapcet.findOne({
           attributes: ["EAPCETRank", "EAPCETHallTicketNo"],
           where: { _student: studentsData[i].id },
@@ -491,12 +466,13 @@ const getLoggedinStudents = async (req, res) => {
         if (!qualifyingDetails.EAPCETHallTicketNo) {
           qualifyingDetails.EAPCETHallTicketNo = "N/A";
         }
+        studentsData[i].loginDetails = loginDetails;
         studentsData[i].id = "YSR24" + studentsData[i].id;
         studentsData[i].qualifyingDetails = qualifyingDetails;
       }
       return res.status(200).json({
         success: true,
-        data: studentsData
+        data: { studentsData, totalStudents }
       });
     }
     return res.status(404).json({
@@ -514,14 +490,52 @@ const getLoggedinStudents = async (req, res) => {
 
 const getOverviewsCount = async (req, res) => {
   try {
-    let totalWalkIns = await databases.students.count();
-    let totalCollectedDocs = await databases.eapcetDecuments.count();
-    let totalLoggedIn = await databases.students.count({
-      where: { isLoggedin: true }
-    });
-    let totalPendingLogIn = await databases.students.count({
-      where: { isLoggedin: false }
-    });
+    const { examType } = req.params;
+
+    let totalWalkIns;
+    if (examType?.toUpperCase() != "DASHBOARD") {
+      totalWalkIns = await databases.students.count({
+        where: { requestType: examType }
+      });
+    } else {
+      totalWalkIns = await databases.students.count();
+    }
+    let totalCollectedDocs;
+    let totalLoggedIn;
+    let totalPendingLogIn;
+    if (examType?.toUpperCase() === "EAPCET") {
+      totalCollectedDocs = await databases.eapcetDecuments.count();
+      totalLoggedIn = await databases.students.count({
+        where: { isLoggedin: true, requestType: examType }
+      });
+      totalPendingLogIn = await databases.students.count({
+        where: { isLoggedin: false, requestType: examType }
+      });
+    } else if (examType?.toUpperCase() === "ECET") {
+      totalCollectedDocs = await databases.eapcetDecuments.count();
+      totalLoggedIn = await databases.students.count({
+        where: { isLoggedin: true, requestType: examType }
+      });
+      totalPendingLogIn = await databases.students.count({
+        where: { isLoggedin: false, requestType: examType }
+      });
+    } else if (examType === "ICET") {
+      totalCollectedDocs = await databases.icetDocuments.count();
+      totalLoggedIn = await databases.students.count({
+        where: { isLoggedin: true, requestType: examType }
+      });
+      totalPendingLogIn = await databases.students.count({
+        where: { isLoggedin: false, requestType: examType }
+      });
+    } else {
+      totalCollectedDocs = await databases.eapcetDecuments.count();
+      totalLoggedIn = await databases.students.count({
+        where: { isLoggedin: true }
+      });
+      totalPendingLogIn = await databases.students.count({
+        where: { isLoggedin: false }
+      });
+    }
     return res.status(200).json({
       success: true,
       data: {
@@ -539,6 +553,7 @@ const getOverviewsCount = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   getAllDocSubmittedStudentsId,
   getAllDocSubmittedStudentsData,

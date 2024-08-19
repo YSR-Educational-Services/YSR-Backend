@@ -1,6 +1,6 @@
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define(
-    "loginDetails",
+    "notifications",
     {
       id: {
         allowNull: false,
@@ -8,21 +8,22 @@ module.exports = function (sequelize, DataTypes) {
         primaryKey: true,
         type: DataTypes.INTEGER
       },
-      slotDate: {
-        type: DataTypes.DATEONLY,
+      time: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+      },
+      title: {
+        type: DataTypes.STRING(255),
         allowNull: false
       },
-      loginId: {
-        type: DataTypes.STRING,
+      body: {
+        type: DataTypes.STRING(255),
         allowNull: false
       },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      ROC: {
-        type: DataTypes.STRING,
-        allowNull: false
+      isRead: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
       },
       _student: {
         allowNull: false,
@@ -35,7 +36,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     {
       sequelize,
-      tableName: "loginDetails",
+      tableName: "notifications",
       timestamps: true,
       indexes: [
         {

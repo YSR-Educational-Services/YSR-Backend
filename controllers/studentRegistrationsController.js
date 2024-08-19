@@ -1,108 +1,15 @@
-const { raw } = require("body-parser");
+
 const databases = require("../config/databases");
 const {
   checkAndWriteHeaders,
   appendToSheet
 } = require("../helpers/googleSheet");
-const { where, Op } = require("sequelize");
-const { default: AsyncQueue } = require("sequelize/lib/dialects/mssql/async-queue");
 
-const createStudentRegistration = async (req, res) => {
-  try {
-    let inputData = req.body;
-    let studentData = await databases.students.create({
-      nameOfApplicant: inputData.nameOfApplicant,
-      fatherName: inputData.fatherName,
-      dateOfBirth: inputData.dateOfBirth,
-      addressOfCommunication: inputData.addressOfCommunication,
-      phoneNumber: inputData.phoneNumber,
-      aadharNo: inputData.aadharNo,
-      category: inputData.category,
-      qualifyingDetails: JSON.stringify(inputData.qualifyingDetails),
-      nameofInstution: inputData.nameofInstution,
-      courseName: inputData.courseName.map((course) => course).join(", "),
-      paymentStructure: inputData.paymentStructure,
-      withReferenceOf: inputData.withReferenceOf,
-      referance: JSON.stringify(inputData.referance)
-    });
-    inputData.downloadLink = `http://localhost:3000/user/student-data-by-id/${studentData.id}`;
-    inputData.id = studentData.id;
-    const values = [
-      [
-        inputData.id,
-        inputData.nameOfApplicant,
-        inputData.fatherName,
-        inputData.dateOfBirth,
-        inputData.addressOfCommunication,
-        inputData.phoneNumber,
-        inputData.aadharNo,
-        inputData.category,
-        inputData.qualifyingDetails
-          .map(
-            (q) =>
-              `Course-${q.course}, Board/University-${q.boardUniversity}, Year-${q.year}, Marks Obtained-${q.markObtained}, Percentage-${q.percentage}, Grade-${q.grade}, H.No-${q.HNo}, Rank-${q.rank}`
-          )
-          .join("; "),
-        inputData.nameofInstution,
-        inputData.courseName
-          .map((c) => `Course ${c.course}- ${c.branch}`)
-          .join("; "),
-
-        //    JSON.stringify(inputData.courseName),
-        inputData.paymentStructure,
-        inputData.withReferenceOf,
-        inputData.referance
-          .map((r) => `Name-${r.name}, Phone Number- ${r.phoneNumber}`)
-          .join("; "),
-        (downloadLink = `http://localhost:3000/user/student-data-by-id/${inputData.id}`)
-      ]
-    ];
-    try {
-      const headerValues = [
-        "Id",
-        "Name Of Applicant",
-        "Father Name",
-        "Date Of Birth",
-        "Address Of Communication",
-        "Phone Number",
-        "Aadhar No",
-        "Category",
-        "Qualifying Details",
-        "Name Of Instution",
-        "Course Name",
-        "Payment Structure",
-        "With Refrence of",
-        "Referance",
-        "Download_Link"
-      ];
-      await checkAndWriteHeaders(headerValues);
-      const response = await appendToSheet(values);
-      // res.status(200).send(response.data);
-    } catch (error) {
-      res.status(500).send("Error writing to sheet: " + error.message);
-    }
-
-    if (studentData) {
-      return res.status(200).json({
-        success: true,
-        message: "Data Submited Successfully....",
-        data: studentData
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
-
+const moment = require("moment")
 
 const createStudent = async (req, res) => {
   try {
     let inputData = req.body;
-
     const mappedReference = inputData.reference.map((reference) => {
       return `${reference.friendName}: ${reference.friendPhoneNumber}`;
     });
@@ -539,38 +446,6 @@ const removeEapcetDocuments = async (req, res)=>{
   }
 }
 
-// const updateEapcetDocumentsById = async (req, res)=>{
-//   try {
-//     let _student = req.params.id;
-//     console.log(_student);
-//     let {date} = req.body;
-//     _student = _student.substring(5)
-//     let isStudentDoctExits = await databases.eapcetDecuments.findOne({where: {_student}});
-//     if (!isStudentDoctExits) {
-//       return res.status(404).json({
-//         success: true,
-//         message: "Data Not Found With This Student ID"
-//       })
-//     }
-//     let updated = await databases.eapcetDecuments.update({date},{where: {_student}});
-//     if (updated>=1) {
-//       return res.status(200).json({
-//         success: true,
-//         message: "Updated Successfully...."
-//       })
-//     }
-//     return res.status(400).json({
-//       success: true,
-//       message: "Updated Unsuccessfull...."
-//     })
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-//   }
-// }
 
 const getEapcetDocumentsById = async (req, res) => {
   try {
@@ -680,6 +555,18 @@ const removeStudentsById = async (req, res) => {
           where: { id: _student }
         });
       }
+      if (studentData.requestType?.toUpperCase() === "ICET") {
+        await databases.eapcetDecuments.destroy({
+          where: { _student: _student }
+        });
+        await databases.eapcet.destroy({
+          where: { _student: _student }
+        });
+        await databases.students.destroy({
+          where: { id: _student }
+        });
+      }
+
       return res.status(200).json({
         success: true,
         message: "Data Deleted Successfully"
@@ -896,11 +783,6 @@ const updateStudentDetails = async (req, res) => {
       ];
     }
 
-    //let temp1 = await checkAndWriteHeaders(headerValues, spreadsheetId);
-    // console.log(temp1);
-    // let temp2 = await appendToSheet(values, spreadsheetId);
-    // console.log("temp1=", temp1, "temp2", temp2);
-
     return res.status(200).json({
       success: true,
       data: student,
@@ -959,7 +841,6 @@ const craeteLoginDetails = async(req, res)=>{
     let _student = req.params.studentId;
     _student =_student.substring(5);
     const inputData = req.body;
-console.log(inputData);
     let isStudentAvailable = await databases.students.findOne({where:{id:_student}})
     if (!isStudentAvailable) {
       return res.status(404).json({
@@ -967,11 +848,41 @@ console.log(inputData);
         message: "Student not found..."
       })
     }
-    const loginData = await databases.loginDetails.create({sloteDate:inputData.sloteDate,loginId:inputData.loginId,email:inputData.email,_student:_student})
+   let isLoginIdExist = await databases.loginDetails.findOne({
+      where:{loginId:inputData.loginId} ,
+      raw:true
+    })
+    if (isLoginIdExist) {
+      return res.status(400).json({
+        success: false,
+        message: "Login Id Already Exist"
+      })
+    }
+    const loginData = await databases.loginDetails.create({
+      slotDate:inputData.slotDate,
+      loginId:inputData.loginId,
+      ROC: inputData.rocNumber,
+      password:inputData.password,
+      _student:_student})
     if (loginData) {
+      await databases.students.update({
+        isLoggedin:true
+      },{where:{id:_student}})
+      //create notifications
+      let date = moment().subtract(10, 'days').calendar();
+      let time = moment().format('LT');
+      let title = "New Student Login Details Submitted";
+      let body = `A student has successfully submitted their new login details on ${date} at ${time}. Please review and verify the information at your earliest convenience.`
+      await databases.notifications.create({
+        _student,
+        time,
+        title,
+        body
+      })
+
       return res.status(200).json({
         success: true,
-        message: "Login Data Submitted Successfully...."
+        message: "Login Data Submited Successfully...."
       })
     }
     return res.status(200).json({
@@ -987,7 +898,6 @@ console.log(inputData);
   }
 }
 module.exports = {
-  createStudentRegistration,
   createStudent,
   getAllStudentsData,
   createEapcetDocuments,

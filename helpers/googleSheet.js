@@ -36,7 +36,7 @@ async function checkAndWriteHeaders(headerValues, spreadsheetId) {
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "Sheet1!A1:W1"
+      range: "Sheet1!A2:W1"
     });
 
     const rows = response.data.values;
